@@ -9,3 +9,7 @@ established by `ibmruntimes/go-recordio`.
 
 - `add/` · toolchain checkpoint: prove Plan 9 assembly compiles, links,
   tests, and benchmarks on amd64.
+- `ebcdic/` · table-driven byte translation between ISO-8859-1 and
+  EBCDIC IBM-1047, the conversion primitive every MVS macro call
+  needs at its parameter list boundary. Includes an s390x stub
+  documenting the TR-instruction collapse.
