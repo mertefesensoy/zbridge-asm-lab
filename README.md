@@ -30,16 +30,3 @@ clean from other hosts).
 - `syscall-linux/` · the trap: Linux `SYSCALL` from Go assembly with
   parameters in registers and return-value evaluation — the dress
   rehearsal for `SVC 35`.
-
-## Docs
-
-- [Interactive module explorer](docs/interactive/zbridge-module-explorer.html) —
-  open in a browser: annotated assembly for every exercise, live demos
-  (including the real IBM-1047 translation table), and the WTO pipeline map.
-- [Mainframe baseline strategy](docs/mainframe-baseline-strategy.md) —
-  the operating plan for when z/OS access arrives: Day-0 checklist,
-  T0→T3 test ladder, what gets skipped and what never does.
-- [Codex handover](docs/codex-handover.md) — self-contained project
-  state and guardrails for AI-assisted continuation.
-- [Implementation docs](docs/implementations/) — one doc per meaningful
-  change (documentation-first workflow).
