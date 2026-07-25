@@ -1,0 +1,57 @@
+# --- Go ---
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+go.work.sum
+
+# Compiled test binaries from `go test -c` (the cross-compile / QEMU workflow
+# produces these constantly — they are build artifacts, never evidence)
+*.test.s390x
+*.test.zos
+
+# --- Emulator artifacts (ADR 0001, Track M / Track L) ---
+# TK5 and Hercules live OUTSIDE this repo (C:\mvs-tk5 — see the setup runbook).
+# These patterns exist so that an accidental copy never lands in git: DASD
+# volumes are hundreds of megabytes and mutate on every IPL.
+*.cckd
+*.cckd64
+*.dasd
+*.3390
+*.3380
+*.tape
+*.het
+*.aws
+hercules.log
+hercules.rc.log
+
+# Raw emulator console spool. Curated extracts belong in docs/evidence/*.md;
+# multi-megabyte raw spool does not.
+*.prt
+*.punch
+spool/
+
+# --- OS / editor ---
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+.idea/
+*.swp
+*~
+
+# --- Claude Code ---
+# .claude/ IS tracked on purpose: hooks, agents, and skills are project
+# infrastructure and every future session should inherit them. Only the
+# personal, machine-local override is ignored.
+.claude/settings.local.json
+
+# --- Scratch ---
+scratch/
+tmp/
+*.bak
