@@ -2,7 +2,6 @@
 
 - Status: **Accepted**
 - Date: 2026-07-25
-- Author: Claude (architecture role), on the owner's decision
 - Decided by: **Mert Efe Şensoy (owner)**, 2026-07-25, in session
 - Supersedes: **ADR 0001 §1** in full. Amends ADR 0001 §3 (the U3 row), §5, and
   reopen-condition #4.

@@ -22,7 +22,9 @@ Both functions collapse onto one instruction family, the same way the `ebcdic` l
 - `Equal` becomes a length check, then a single `CLC`; equal iff the condition code is `0`.
 - `Compare` becomes a `CLC` over the common length, then a branch on the condition code for the ordering, with the same length tiebreak as the amd64 `bylen` path.
 
-`CLC` carries its length in the instruction (up to 256 bytes); a length known only at run time uses `EX` or `EXRL` to patch the length byte, or a loop issuing `CLC` in 256-byte strides. The `bytecmp_s390x.s` file is a documented stub for Phase 1b.
+`CLC` carries its length in the instruction (up to 256 bytes); a length known only at run time uses `EXRL` to patch the length byte, and longer buffers loop issuing `CLC` in 256-byte strides. **Implemented and tested as of 2026-07-25** — `bytecmp_s390x.s` is a real implementation, not a stub, and all four tests pass on linux/s390x under QEMU 10.2.1 (`docs/evidence/E-L-s390x-port-qemu-2026-07-25.md`).
+
+Note one correction to the original plan: **`EX` is not available.** Go's s390x assembler has `EXRL` but no `EX` — 729 mnemonics in `cmd/internal/obj/s390x/anames.go` and `EX` is not among them. `EXRL` requires z10 or later, which is far below any target this project will meet, but the constraint is real. The structure here follows `internal/bytealg/equal_s390x.s` and `compare_s390x.s`, which solve the identical problem in the Go standard library.
 
 ## ❯ Benchmark note
 

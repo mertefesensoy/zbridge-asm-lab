@@ -8,11 +8,9 @@ func TestGetSPNonZero(t *testing.T) {
 	}
 }
 
-func TestGetBPNonZero(t *testing.T) {
-	if GetBP() == 0 {
-		t.Error("GetBP() returned 0; the frame pointer should be set during execution")
-	}
-}
+// The frame-pointer test lives in regs_amd64_test.go: GetBP is amd64-only,
+// because s390x has no frame-pointer register. The s390x register tests are in
+// regs_s390x_test.go. Everything in this file is architecture-neutral.
 
 // TestFrameSizeShiftsSP shows that a declared stack frame lowers the hardware
 // stack pointer by at least the frame size. Both functions are called from the

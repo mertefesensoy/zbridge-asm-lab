@@ -2,7 +2,6 @@
 
 - Status: **Accepted**
 - Date: 2026-07-25
-- Author: Claude (architecture role)
 - Decided by: **Mert Efe Şensoy (owner)**, 2026-07-25 — chose "unblock fully:
   multi-service enterprise surface", lifting goal-prompt §5 autonomy boundary 1
 - Builds on: `docs/codex-handover.md` §3 (the WTO call-path decomposition) and §4

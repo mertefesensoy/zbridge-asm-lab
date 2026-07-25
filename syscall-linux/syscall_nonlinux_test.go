@@ -1,9 +1,9 @@
-//go:build !linux || !amd64
+//go:build !linux || (!amd64 && !s390x)
 
 package syscalllinux
 
 import "testing"
 
-func TestSyscallLinuxRequiresLinuxAMD64(t *testing.T) {
-	t.Skip("syscall-linux executes the Linux amd64 SYSCALL instruction; run on linux/amd64 for runtime tests")
+func TestSyscallLinuxRequiresSupportedTarget(t *testing.T) {
+	t.Skip("syscall-linux executes the Linux SYSCALL trap; run on linux/amd64 or linux/s390x for runtime tests")
 }

@@ -23,7 +23,11 @@ Two amd64 details collapse on s390x, the same way the `ebcdic` lookup loop colla
 - The big-endian length. `STH` (Store Halfword, Go asm `MOVH`) writes both bytes in big-endian order in one instruction, so the manual high and low byte split disappears.
 - The byte copy. `MVC` (Move Characters) copies up to 256 bytes in one instruction, which covers every single-line WTO message, so the copy loop disappears too.
 
-String-header access is the same shape; only the load mnemonic changes (`MOVD`). The `strmanip_s390x.s` file is a documented stub that fails the build if targeted, to be filled in during Phase 1b.
+String-header access is the same shape; only the load mnemonic changes (`MOVD`). **Implemented and tested as of 2026-07-25** — all five tests pass on linux/s390x under QEMU 10.2.1 (`docs/evidence/E-L-s390x-port-qemu-2026-07-25.md`).
+
+The big-endian header really is one instruction: `MOVH R5, 0(R2)` replaces amd64's `SHRQ` plus two `MOVB` stores, because on a big-endian machine a halfword store puts the high byte at the lower address by construction. That is the most direct evidence in this repo that the target architecture fits the WTO parameter list better than the machine we develop on — the WPL begins with exactly such a field.
+
+The copy uses `MVC`, with `EXRL` supplying the runtime length (the length is encoded in the instruction text, so it cannot be a register operand). Every single-line WTO message fits in one `MVC`; the 256-byte stride loop exists only because `WrapLengthPrefixed` is documented to accept up to 65535 bytes.
 
 ## ❯ Benchmark note
 

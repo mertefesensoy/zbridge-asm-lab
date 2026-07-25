@@ -31,7 +31,22 @@ Both functions treat values returned in `AX` from `-4095` through `-1` as `errno
 
 On z/OS, WTO is not a Linux syscall. It is an MVS service reached with `SVC 35`. Parameters are placed in registers such as `R0` and `R1`, the `SVC` instruction traps to the supervisor, and the return code is read from a register afterward.
 
-The `syscall_linux_s390x.s` file is a documented stub for Phase 1b. It exists to keep the roadmap explicit: this exercise proves the trap shape on Linux amd64 first, then the project swaps in the s390x/z/OS register convention and `SVC` instruction later.
+**Implemented and tested as of 2026-07-25** — `syscall_linux_s390x.s` is a real implementation and all three tests pass on linux/s390x under QEMU 10.2.1 (`docs/evidence/E-L-s390x-port-qemu-2026-07-25.md`).
+
+Having both targets is more instructive than either alone:
+
+| | amd64 | s390x |
+|---|---|---|
+| Service number | `AX` | `R1` |
+| Arguments | `DI`, `SI`, `DX`, `R10`, `R8`, `R9` | `R2`–`R7` |
+| Trap | `SYSCALL` | `SYSCALL`, which assembles to **`SVC 0`** |
+| Result | `AX` | `R2` — the *first argument* register |
+| `write` | 1 | **4** |
+| `getpid` | 39 | **20** |
+
+The numbers differ because a system-call table is a per-architecture contract, not a per-OS one; s390x inherits the numbering from the 31-bit s390 port. Verified against Go's own `runtime/sys_linux_s390x.s`.
+
+Two things carry forward to the endgame. First, on s390x the result comes back in the register that carried argument one, so anything needing that argument afterwards must save it. Second — and this is the point of the exercise — **`SVC` appears here, on Linux.** Linux takes the service selector from `R1` and issues `SVC 0`; MVS encodes the selector in the instruction itself, so WTO is literally `SVC 35`. Note that Go's s390x assembler has no `SVC` mnemonic at all, so `SVC 35` will have to be hand-encoded as `BYTE $0x0A; BYTE $0x23`, exactly as `TR` is in the `ebcdic` exercise.
 
 ## Build and Test
 

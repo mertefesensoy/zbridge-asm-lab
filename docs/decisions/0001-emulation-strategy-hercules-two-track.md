@@ -2,13 +2,11 @@
 
 - Status: Accepted
 - Date: 2026-07-25
-- Author: Claude (architecture role)
 - Owner: Mert Efe Şensoy · Mentor: Jürgen Holtz (IBM), who supplied the Hercules
   entry point (<https://hercules-390.github.io/html/>) via a former colleague with
   operational Hercules experience
 - Resolves: the "middle ground before real hardware" question raised 2026-07-25
-- Builds on: the roadmap PDF §Risks, p.7 ("Hercules is not legal for z/OS") —
-  `zbridge-asm-roadmap.pdf`, moved into the repo root 2026-07-25;
+- Builds on: the roadmap PDF §Risks ("Hercules is not legal for z/OS"),
   `docs/mainframe-baseline-strategy.md` (the T0→T3 ladder and the scarcity
   principle), `docs/codex-handover.md` §3 (the WTO call-path decomposition)
 
