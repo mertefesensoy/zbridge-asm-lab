@@ -1,36 +1,9 @@
 # Research Brief 002 · Prior-art census: does a public Go-assembly WTO implementation exist?
 
-- Status: **ANSWERED** — returned 2026-07-25
+- Status: **OPEN**
 - Date: 2026-07-25
-- Requested by: Claude (architecture role)
 - Consumed by: the roadmap's Thesis section; ADR 0001; any published artifact
 - Priority: high — this validates the project's novelty claim
-- Return: `research/002-prior-art-census-go-assembly-mvs-services.md`
-
-> ## Acceptance-criteria audit (2026-07-25)
->
-> | # | Criterion | Met? |
-> |---|---|---|
-> | 1 | Census table: name · language · implements · direct SVC or C shim · license · last activity · URL | **Partial.** Table present and correctly distinguishes direct SVC from C shim — the distinction the brief called the entire technical point. "Last activity" is given as "Active", not as a date. |
-> | 2 | Explicit verdict with documented search surface | **Yes.** UPHELD, with sources, query terms, and date (2026-07-25) all recorded. |
-> | 3 | Same verdict structure for Q4 | **Yes.** UPHELD, dated. |
-> | 4 | Every claim tagged with confidence | **Yes.** |
-> | 5 | Re-check date | **Yes.** October 2026, or immediately before artifact submission. |
->
-> **Verdict accepted.** Both negative existence claims — no public Go-assembly WTO
-> implementation, and no published `utils.s` walkthrough — are **UPHELD** with a
-> documented search surface, which is what makes them defensible in a thesis.
->
-> **Two gaps, neither blocking:** Q2 asked specifically for *abandoned and
-> experimental* work on the stated grounds that an abandoned attempt is often the
-> most informative prior art; the return reports only that nothing substantial was
-> found, without evidence that partial work was swept for. Q5 asked for last-commit
-> dates and got qualitative "Active". Both fold into the pre-publication re-run
-> rather than a new brief — the novelty claim decays anyway and must be re-verified
-> before release regardless.
->
-> **Consequence for the thesis:** the census table and its search surface become an
-> appendix, per §"How the result will be used". The contribution framing is unchanged.
 
 ## Why this brief exists
 
