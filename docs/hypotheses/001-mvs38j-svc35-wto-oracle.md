@@ -80,6 +80,31 @@ answered; the documented macro expansion for Q5 not found (the return supplied a
 
 ---
 
+## Evidence log — Brief 003 (added 2026-07-26)
+
+Brief 003 (`research/003-wto-wpl-layout-source-and-return-code-contract.md`) landed 2026-07-26 and supersedes the missing pieces of Brief 001.
+
+### What arrived
+
+- **C1/C2 (WPL Layout):** The byte layout for MVS 3.8j is definitively **not documented in prose** and exists only in the `IEZWPL` mapping macro. The "text length + 4" rule is inferred from reading the macro. On z/OS, the layout is documented in *z/OS MVS Data Areas*.
+- **C3 (Return Code Contract):** A **major documented divergence** exists. MVS 3.8j issues **no return code** in R15 for a single-line WTO. z/OS **does** issue a return code in R15.
+- **Missing Information:** The explicit bit-by-bit table for MCS flags (Q3) was not found, nor was a published `WTO` macro expansion (Q6).
+
+### Sub-claim status after Brief 003
+
+| | Sub-claim | Status | Basis |
+|---|---|---|---|
+| **C1** | Field layout identical | **OPEN** | Still requires the E1 assembler listing on MVS 3.8j to establish the baseline mapping macro shape. |
+| **C2** | Length-field semantics identical | **OPEN** | Still lacks a prose citation on MVS 3.8j. Relies on the E1 listing. |
+| **C3** | R1 in, `SVC 35`, R15 out | **CONTRADICTED (MVS side)** | Brief 003 confirmed that MVS 3.8j does not issue a return code in R15 for single-line WTO. |
+| **C4** | R15 = 0 means accepted, on both | **CONTRADICTED (MVS side)** | No return code means there is nothing to compare to 0. |
+
+### Conclusion on Brief 003
+
+The contradiction on C3 and C4 validates the "E-ORACLE-PARTIAL" fallback proposed after Line 1. A single-line WTO on MVS 3.8j issues no return code, so the status-handling half of the WPL construction does not transfer directly to z/OS. E1 is now strictly required to observe the macro expansion and answer C1/C2, as IBM prose documentation does not exist for the MVS 3.8j layout.
+
+---
+
 ADR 0001's entire return on investment rests on one unproven claim: that work done
 against MVS 3.8j's `SVC 35` tells us something true about z/OS's `SVC 35`. If that
 claim holds, four of the six Phase 3b steps are retired before mainframe access

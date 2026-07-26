@@ -1,7 +1,10 @@
 # ADR 0002 · z/OS under Hercules is permitted for this project; ADR 0001 §1 is superseded
 
-- Status: **Accepted**
-- Date: 2026-07-25
+- Status: **WITHDRAWN — 2026-07-26.** The premise did not survive the owner's own
+  research. ADR 0001 §1 is **restored and governs again**: z/OS under Hercules is out.
+  This was not an override; it is reopen-condition #1 of this ADR firing exactly as
+  written. **See §10 (Withdrawal) at the end before reading anything above as current.**
+- Date: 2026-07-25 (accepted), 2026-07-26 (withdrawn)
 - Decided by: **Mert Efe Şensoy (owner)**, 2026-07-25, in session
 - Supersedes: **ADR 0001 §1** in full. Amends ADR 0001 §3 (the U3 row), §5, and
   reopen-condition #4.
@@ -200,7 +203,98 @@ about Phase 3b step 6. That question is unaffected by this ADR and remains open.
    as a negative result about emulation, Track M continues on TK5, and the T-ladder
    reverts to being the only path to U3a.
 
-## 9. Links
+## 10. Withdrawal — 2026-07-26
+
+**This ADR is withdrawn. ADR 0001 §1 is restored and governs: z/OS under Hercules is
+ruled out.** Everything in §1 through §9 above is retained unchanged as the record of a
+decision that was made, tested against reality, and reversed.
+
+### What happened
+
+The owner researched the entitlement question and reported on 2026-07-26:
+
+> *"For the license problem I have done some research but unfortunately we do not have
+> that kind of agreement or a special permission for us to use."*
+
+That is §8's **reopen-condition #1** firing precisely as written: *"The citation slot in
+§2 cannot be filled. If no instrument, entitlement, or written statement can be
+produced, this ADR is reduced to a record of an unsubstantiated premise and §1's
+supersession is withdrawn."*
+
+So this is not an override of a decision and it is not a mistake being cleaned up after.
+It is the decision working. The ADR named its own failure condition in advance, the
+condition occurred, and the documented consequence was applied.
+
+### The cost of having been wrong for one day: nothing
+
+This is worth stating plainly, because it is the strongest argument for the way this
+project handles claims.
+
+§2 required the premise to be treated as **registered, not cited**, and imposed three
+restrictions while the citation slot was empty:
+
+1. Nothing in the thesis, the repository, a talk, a post, or any mentor-facing document
+   may state that IBM permits z/OS under Hercules.
+2. Evidence from a z/OS guest must carry `entitlement: OWNER-ASSERTED, uncited`.
+3. This ADR is the only document that asserts the premise; others link to it.
+
+**All three held.** No z/OS guest was ever created, so restriction 2 was never
+exercised. No document outside this ADR asserted the premise, so nothing else needs
+correcting. Nothing was published. The withdrawal touches this file, four
+status/pointer documents, and no technical work whatsoever.
+
+Compare the counterfactual: had the premise been written into the ADR as a cited fact,
+it would by now be in the goal prompt, the handover, the roadmap narrative, and
+plausibly in something shown to a mentor at IBM — and the correction would have been a
+retraction of a licensing claim about IBM rather than an internal status change.
+
+### What this does NOT cost the project
+
+**The critical path is untouched.** ADR 0002 was an accelerant, never a dependency:
+
+- **Track M was always the primary track and is entirely unaffected.** MVS 3.8j is
+  freely runnable under Hercules; that has never been in question. Rungs E0–E3 stand
+  exactly as ADR 0001 §6 defines them.
+- **The WPL layout — the project's actual blocker — was never going to be solved by a
+  z/OS licence anyway.** The runbook's §11 already identifies the real source:
+  *"E1's assembler listing shows the exact parameter-list bytes IBM's own macro
+  generates, which is the ground truth this project needs and which no manual can be
+  fully trusted for."* That listing comes off MVS 3.8j. No entitlement required.
+- **U1 is already retired** on QEMU, and QEMU needs no licence.
+- **The proposed rungs E4–E6 are withdrawn** along with §5's table. E0–E3 are restored
+  as the whole of the E-ladder.
+
+### What is restored
+
+| Item | Restored to |
+|---|---|
+| ADR 0001 §1 | In force: z/OS under Hercules excluded; z/OS work happens on entitled access or not at all |
+| ADR 0001 §3, U3 row | **"No. Nothing emulates this."** The U3a/U3b split proposed in §3 above is withdrawn |
+| ADR 0001 §6 | E-ladder is E0–E3 only |
+| ADR 0001 reopen-condition #4 | In force again, and it is now the live question: *"If IBM offers a legally entitled emulated z/OS for students or ambassadors, it supersedes Track M for U2 entirely"* |
+| H001 | **Fully load-bearing again.** §6 above speculated that reaching a z/OS guest would make the ancestor-divergence question moot. It will not be reached, so H001 is the mechanism for U2 and its C4 finding still stands |
+
+### The one finding that survives the withdrawal
+
+**U3b — that upstream Go cannot target z/OS — is unaffected and remains true.**
+`go tool dist list` (go1.26.3) offers `linux/s390x` and no `zos/s390x`; `"zos"` is in
+`internal/syslist` but the target is absent from `internal/platform`. That was verified
+against the toolchain, not inferred from the licensing premise, so it stands on its own
+evidence (`docs/evidence/E-L-s390x-port-qemu-2026-07-25.md`, finding F3).
+
+It keeps its practical consequence: **obtaining IBM's Go fork is a hard dependency of
+the endgame, and it is a separate question from the z/OS licence.** A compiler that
+emits z/OS binaries is not the same entitlement as a z/OS system to run them on, and it
+is worth asking the mentor about both.
+
+### Open, and going to the mentor
+
+The owner consults Jürgen Holtz on Monday 2026-07-27. The questions are collected in
+`docs/mentor-briefings/2026-07-27-zos-access-and-toolchain.md`. This ADR should not be
+revived on a verbal "that's probably fine" — reviving it requires the §2 citation slot
+filled with an actual instrument, which is the same bar it failed today.
+
+## 11. Links
 
 - `docs/decisions/0001-emulation-strategy-hercules-two-track.md` — §1 superseded here;
   §2–§7 stand, and §7's provenance rules are reaffirmed

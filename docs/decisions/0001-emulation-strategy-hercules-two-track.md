@@ -22,6 +22,8 @@ before real hardware, on the model of the automated, documented workflow used on
 CASSANDRA project. The mentor independently supplied the Hercules documentation
 entry point.
 
+*(Note on novelty: Research Brief 002 returned 2026-07-25, exhaustively confirming that no public Go-assembly WTO implementation exists. This upholds the project's novelty claim and raises the value of the emulation ladder described below, as the artifact being built is a documented first.)*
+
 The naive form of the proposal — *run z/OS under Hercules* — is not available, and
 the roadmap already says so. Accepting that and stopping would be the wrong
 conclusion, because it answers a question that was never the useful one. The useful

@@ -1,11 +1,10 @@
 # Research Brief 003 · Where the WTO parameter list is *actually* documented, and what comes back in R15
 
-- Status: **OPEN**
+- Status: **ANSWERED** — returned 2026-07-26
 - Date: 2026-07-25
 - Requested by: Claude (architecture role)
-- Consumed by: `docs/hypotheses/001-mvs38j-svc35-wto-oracle.md` — C1, C2 and C4;
-  `docs/decisions/0001-emulation-strategy-hercules-two-track.md` §6 (the Phase 3b
-  retirement table)
+- Consumed by: `docs/hypotheses/001-mvs38j-svc35-wto-oracle.md` — C1, C2 and C4; `docs/decisions/0001-emulation-strategy-hercules-two-track.md` §6 (the Phase 3b retirement table)
+- Return: `research/003-wto-wpl-layout-source-and-return-code-contract.md`
 - Supersedes the unmet parts of brief 001. **Does not** re-ask what 001 answered well.
 - Priority: **highest open item.** Rung E2 still cannot be designed without Q1/Q2,
   and ADR 0001 §6 has a table entry in doubt until Q4 is answered.

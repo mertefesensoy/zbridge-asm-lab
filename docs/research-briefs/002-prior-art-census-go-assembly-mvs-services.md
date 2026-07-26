@@ -1,8 +1,9 @@
 # Research Brief 002 · Prior-art census: does a public Go-assembly WTO implementation exist?
 
-- Status: **OPEN**
+- Status: **ANSWERED** — UPHELD, returned 2026-07-25
 - Date: 2026-07-25
 - Consumed by: the roadmap's Thesis section; ADR 0001; any published artifact
+- Return: `research/002-prior-art-census-go-assembly-mvs-services.md`
 - Priority: high — this validates the project's novelty claim
 
 ## Why this brief exists
