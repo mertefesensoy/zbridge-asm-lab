@@ -1,0 +1,290 @@
+                        ZZZZZZZZZZZZ  BBBBBBBBBBB   EEEEEEEEEEEE       11       WW        WW  TTTTTTTTTTTT  OOOOOOOOOOOO
+                       ZZZZZZZZZZZZ  BBBBBBBBBBBB  EEEEEEEEEEEE      111       WW        WW  TTTTTTTTTTTT  OOOOOOOOOOOO
+                               ZZ   BB        BB  EE               1111       WW        WW       TT       OO        OO
+                             ZZ    BB        BB  EE                 11       WW        WW       TT       OO        OO
+                           ZZ     BB       BB   EE                 11       WW        WW       TT       OO        OO
+                      ZZZZZZZ    BBBBBBBBBB    EEEEEEEE           11       WW        WW       TT       OO        OO
+                     ZZZZZZZ    BBBBBBBBBB    EEEEEEEE           11       WW   WW   WW       TT       OO        OO
+                     ZZ        BB       BB   EE                 11       WW  WWWW  WW       TT       OO        OO
+                   ZZ         BB        BB  EE                 11       WW WW  WW WW       TT       OO        OO
+                 ZZ          BB        BB  EE                 11       WWWW    WWWW       TT       OO        OO
+               ZZZZZZZZZZZ  BBBBBBBBBBBB  EEEEEEEEEEEE   1111111111   WWW      WWW       TT       OOOOOOOOOOOO
+             ZZZZZZZZZZZZ  BBBBBBBBBBB   EEEEEEEEEEEE   1111111111   WW        WW       TT       OOOOOOOOOOOO
+
+
+
+                    JJJJJJJJJJ        444                                                              AAAAAAAAAA
+                    JJJJJJJJJJ       4444                                                             AAAAAAAAAAAA
+                        JJ          44 44                                                             AA        AA
+                        JJ         44  44                                                             AA        AA
+                        JJ        44   44                                                             AA        AA
+                        JJ       44444444444                                                          AAAAAAAAAAAA
+                        JJ      444444444444                                                          AAAAAAAAAAAA
+                        JJ             44                                                             AA        AA
+                  JJ    JJ             44                                                             AA        AA
+                  JJ    JJ             44                                                             AA        AA
+                  JJJJJJJJ             44                                                             AA        AA
+                   JJJJJJ              44                                                             AA        AA
+
+
+****A  START  JOB    4  ZBE1WTO   WTO TO CONSOLE        ROOM        3.27.58 PM 26 JUL 26  PRINTER1  SYS TK5R  JOB    4  START  A****
+****A  START  JOB    4  ZBE1WTO   WTO TO CONSOLE        ROOM        3.27.58 PM 26 JUL 26  PRINTER1  SYS TK5R  JOB    4  START  A****
+****A  START  JOB    4  ZBE1WTO   WTO TO CONSOLE        ROOM        3.27.58 PM 26 JUL 26  PRINTER1  SYS TK5R  JOB    4  START  A****
+****A  START  JOB    4  ZBE1WTO   WTO TO CONSOLE        ROOM        3.27.58 PM 26 JUL 26  PRINTER1  SYS TK5R  JOB    4  START  A****
+                                                J E S 2   J O B   L O G
+
+
+15.27.58 JOB    4  IEF677I WARNING MESSAGE(S) FOR JOB ZBE1WTO  ISSUED
+15.27.58 JOB    4  $HASP373 ZBE1WTO  STARTED - INIT  1 - CLASS A - SYS TK5R
+15.27.58 JOB    4  IEF403I ZBE1WTO - STARTED - TIME=15.27.58
+15.27.58 JOB    4  IEFACTRT - Stepname  Procstep  Program   Retcode
+15.27.58 JOB    4  ZBE1WTO    ASM       ASM       IFOX00    RC= 0000
+15.27.58 JOB    4  ZBE1WTO    ASM       LKED      IEWL      RC= 0016
+15.27.58 JOB    4  ZBE1WTO    ASM       GO        PGM=*.DD  *FLUSH*
+15.27.58 JOB    4  IEF404I ZBE1WTO - ENDED - TIME=15.27.58
+15.27.58 JOB    4  $HASP395 ZBE1WTO  ENDED
+
+
+------ JES2 JOB STATISTICS ------
+
+
+ 26 JUL 26 JOB EXECUTION DATE
+
+
+        19 CARDS READ
+
+
+       194 SYSOUT PRINT RECORDS
+
+
+         0 SYSOUT PUNCH RECORDS
+
+
+      0.00 MINUTES EXECUTION TIME
+    1     //ZBE1WTO  JOB (ZBRIDGE),'WTO TO CONSOLE',CLASS=A,MSGCLASS=A,           JOB    4
+          //             MSGLEVEL=(1,1)
+          ***
+          *** zbridge-asm-lab rung E1 gate: a program using the WTO macro puts a
+          *** message on the MVS operator console.
+          ***
+          *** Console etiquette (codex-handover guardrail): the message is tagged
+          *** ZBRIDGE TEST and issued exactly once.
+          ***
+    2     //ASM      EXEC ASMFCLG,PARM.ASM='LIST,NODECK'
+    3     XXASMFCLG  PROC MAC='SYS1.MACLIB',MAC1='SYS1.MACLIB',                   00000100
+          XX         MAC2='SYS1.MACLIB',MAC3='SYS1.MACLIB',SOUT='*'               00000200
+    4     XXASM      EXEC PGM=IFOX00,PARM=OBJ,REGION=128K                         00000300
+    5     XXSYSLIB   DD   DSN=&MAC,DISP=SHR                                       00000400
+    6     XX         DD   DSN=&MAC1,DISP=SHR                                      00000500
+    7     XX         DD   DSN=&MAC2,DISP=SHR                                      00000600
+    8     XX         DD   DSN=&MAC3,DISP=SHR                                      00000700
+    9     XXSYSUT1   DD   DSN=&&SYSUT1,UNIT=SYSSQ,SPACE=(1700,(600,100)),         00000800
+          XX             SEP=(SYSLIB)                                             00000900
+   10     XXSYSUT2   DD   DSN=&&SYSUT2,UNIT=SYSSQ,SPACE=(1700,(300,50)),          00001000
+          XX             SEP=(SYSLIB,SYSUT1)                                      00001100
+   11     XXSYSUT3   DD   DSN=&&SYSUT3,UNIT=SYSSQ,SPACE=(1700,(300,50))           00001200
+   12     XXSYSPRINT DD   SYSOUT=&SOUT,DCB=BLKSIZE=1089                           00001300
+   13     XXSYSPUNCH DD   SYSOUT=B                                                00001400
+   14     XXSYSGO    DD   DSN=&&OBJSET,UNIT=SYSSQ,SPACE=(80,(200,50)),            00001500
+          XX             DISP=(MOD,PASS)                                          00001600
+   15     //ASM.SYSIN DD  *
+   16     XXLKED     EXEC PGM=IEWL,PARM=(XREF,LET,LIST,NCAL),REGION=128K,         00001700
+          XX             COND=(8,LT,ASM)                                          00001800
+   17     XXSYSLIN   DD   DSN=&&OBJSET,DISP=(OLD,DELETE)                          00001900
+   18     XX         DD   DDNAME=SYSIN                                            00002000
+   19     XXSYSLMOD  DD   DSN=&&GOSET(GO),UNIT=SYSDA,SPACE=(1024,(50,20,1)),      00002100
+          XX             DISP=(MOD,PASS)                                          00002200
+   20     XXSYSUT1   DD   DSN=&&SYSUT1,UNIT=(SYSDA,SEP=(SYSLIN,SYSLMOD)),         00002300
+          XX             SPACE=(1024,(50,20))                                     00002400
+   21     XXSYSPRINT DD   SYSOUT=&SOUT                                            00002500
+   22     XXGO       EXEC PGM=*.LKED.SYSLMOD,COND=((8,LT,ASM),(4,LT,LKED))        00002600
+ STMT NO. MESSAGE
+-
+    5     IEF653I SUBSTITUTION JCL - DSN=SYS1.MACLIB,DISP=SHR
+    6     IEF653I SUBSTITUTION JCL - DSN=SYS1.MACLIB,DISP=SHR
+    7     IEF653I SUBSTITUTION JCL - DSN=SYS1.MACLIB,DISP=SHR
+    8     IEF653I SUBSTITUTION JCL - DSN=SYS1.MACLIB,DISP=SHR
+   12     IEF653I SUBSTITUTION JCL - SYSOUT=*,DCB=BLKSIZE=1089
+   21     IEF653I SUBSTITUTION JCL - SYSOUT=*
+   22     IEF686I DDNAME REFERRED TO ON DDNAME KEYWORD IN PRIOR STEP WAS NOT RESOLVED
+IEF236I ALLOC. FOR ZBE1WTO ASM ASM
+IEF237I 390  ALLOCATED TO SYSLIB
+IEF237I 390  ALLOCATED TO
+IEF237I 390  ALLOCATED TO
+IEF237I 390  ALLOCATED TO
+IEF237I 292  ALLOCATED TO SYSUT1
+IEF237I 290  ALLOCATED TO SYSUT2
+IEF237I 291  ALLOCATED TO SYSUT3
+IEF237I JES2 ALLOCATED TO SYSPRINT
+IEF237I JES2 ALLOCATED TO SYSPUNCH
+IEF237I 293  ALLOCATED TO SYSGO
+IEF237I JES2 ALLOCATED TO SYSIN
+IEF142I ZBE1WTO ASM ASM - STEP WAS EXECUTED - COND CODE 0000
+IEF285I   SYS1.MACLIB                                  KEPT          *-------13
+IEF285I   VOL SER NOS= TK5RES.
+IEF285I   SYS1.MACLIB                                  KEPT          *--------0
+IEF285I   VOL SER NOS= TK5RES.
+IEF285I   SYS1.MACLIB                                  KEPT          *--------0
+IEF285I   VOL SER NOS= TK5RES.
+IEF285I   SYS1.MACLIB                                  KEPT          *--------0
+IEF285I   VOL SER NOS= TK5RES.
+IEF285I   SYS26207.T152758.RA000.ZBE1WTO.SYSUT1        DELETED       *-------77
+IEF285I   VOL SER NOS= WORK03.
+IEF285I   SYS26207.T152758.RA000.ZBE1WTO.SYSUT2        DELETED       *-------17
+IEF285I   VOL SER NOS= WORK01.
+IEF285I   SYS26207.T152758.RA000.ZBE1WTO.SYSUT3        DELETED       *--------8
+IEF285I   VOL SER NOS= WORK02.
+IEF285I   JES2.JOB00004.SO0102                         SYSOUT
+IEF285I   JES2.JOB00004.SO0103                         SYSOUT
+IEF285I   SYS26207.T152758.RA000.ZBE1WTO.OBJSET        PASSED        *--------0
+IEF285I   VOL SER NOS= WORK04.
+IEF285I   JES2.JOB00004.SI0101                         SYSIN
+IEF373I STEP /ASM     / START 26207.1527
+IEF374I STEP /ASM     / STOP  26207.1527 CPU    0MIN 00.06SEC SRB    0MIN 00.00SEC VIRT   128K SYS   192K
+************************************************************************************************************************************
+*     1. Jobstep of job: ZBE1WTO     Stepname: ASM         Program name: IFOX00     Executed on 26.07.26 from 15.27.58 to 15.27.58 *
+*         elapsed time  00:00:00,10                      CPU-Identifier:  TK5R           Page-in:      0                           *
+*             CPU time  00:00:00,06               Virtual Storage used:    128K         Page-out:      0                           *
+*           corr. CPU:  00:00:00,06   CPU time has been corrected by  1 / 1,0  multiplier                                          *
+*                                                                                                                                  *
+*     I/O Operation                                                                                                                *
+*     Number of records read via DD * or DD DATA:      7                                                                           *
+*     390......13 390.......0 390.......0 390.......0 292......77 290......17 291.......8 DMY.......0 DMY.......0 293.......0      *
+*     DMY.......0                                                                                                                  *
+*                                                                                                                                  *
+*                                          Charge for step (w/o SYSOUT):          0,10                                             *
+************************************************************************************************************************************
+IEF236I ALLOC. FOR ZBE1WTO LKED ASM
+IEF237I 293  ALLOCATED TO SYSLIN
+IEF237I DMY  ALLOCATED TO
+IEF237I 291  ALLOCATED TO SYSLMOD
+IEF237I 292  ALLOCATED TO SYSUT1
+IEF237I JES2 ALLOCATED TO SYSPRINT
+IEF142I ZBE1WTO LKED ASM - STEP WAS EXECUTED - COND CODE 0016
+IEF285I   SYS26207.T152758.RA000.ZBE1WTO.OBJSET        DELETED       *--------1
+IEF285I   VOL SER NOS= WORK04.
+IEF285I   SYS26207.T152758.RA000.ZBE1WTO.GOSET         PASSED        *--------0
+IEF285I   VOL SER NOS= WORK02.
+IEF285I   SYS26207.T152758.RA000.ZBE1WTO.SYSUT1        DELETED       *--------0
+IEF285I   VOL SER NOS= WORK03.
+IEF285I   JES2.JOB00004.SO0104                         SYSOUT
+IEF373I STEP /LKED    / START 26207.1527
+IEF374I STEP /LKED    / STOP  26207.1527 CPU    0MIN 00.01SEC SRB    0MIN 00.00SEC VIRT   128K SYS   200K
+************************************************************************************************************************************
+*     2. Jobstep of job: ZBE1WTO     Stepname: LKED        Program name: IEWL       Executed on 26.07.26 from 15.27.58 to 15.27.58 *
+*         elapsed time  00:00:00,03                      CPU-Identifier:  TK5R           Page-in:      0                           *
+*             CPU time  00:00:00,01               Virtual Storage used:    128K         Page-out:      0                           *
+*           corr. CPU:  00:00:00,01   CPU time has been corrected by  1 / 1,0  multiplier                                          *
+*                                                                                                                                  *
+*     I/O Operation                                                                                                                *
+*     Number of records read via DD * or DD DATA:      0                                                                           *
+*     293.......1 DMY.......0 291.......0 292.......0 DMY.......0                                                                  *
+*                                                                                                                                  *
+*                                          Charge for step (w/o SYSOUT):          0,01                                             *
+************************************************************************************************************************************
+IEF202I ZBE1WTO GO ASM - STEP WAS NOT RUN BECAUSE OF CONDITION CODES
+IEF272I ZBE1WTO GO ASM - STEP WAS NOT EXECUTED.
+IEF373I STEP /GO      / START 26207.1527
+IEF374I STEP /GO      / STOP  26207.1527 CPU    0MIN 00.00SEC SRB    0MIN 00.00SEC VIRT     0K SYS     0K
+IEF237I 291  ALLOCATED TO SYS00001
+IEF285I   SYS26207.T152758.RA000.ZBE1WTO.R0000001      KEPT          *--------0
+IEF285I   VOL SER NOS= WORK02.
+IEF285I   SYS26207.T152758.RA000.ZBE1WTO.GOSET         DELETED
+IEF285I   VOL SER NOS= WORK02.
+IEF375I  JOB /ZBE1WTO / START 26207.1527
+IEF376I  JOB /ZBE1WTO / STOP  26207.1527 CPU    0MIN 00.07SEC SRB    0MIN 00.00SEC
+                                               EXTERNAL SYMBOL DICTIONARY                                      PAGE    1
+
+
+SYMBOL   TYPE  ID   ADDR  LENGTH LDID                                                            ASM 0201 15.27 07/26/26
+
+ZBE1WTO   SD  0001 000000 000044                                                                                                               PAGE    2
+
+
+  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                       ASM 0201 15.27 07/26/26
+
+000000                                1 ZBE1WTO  CSECT
+                                      2          SAVE  (14,12)
+000000                                3+         DS    0H                                                       01650000
+000000 90EC D00C      0000C           4+         STM   14,12,12(13)                      SAVE REGISTERS         02950000
+000004 18CF                           5          LR    12,15
+                            00000     6          USING ZBE1WTO,12
+                                      7          WTO   'ZBRIDGE TEST E1 WTO REACHED THE CONSOLE'
+000006 0700                           8+         CNOP  0,4                                                      00049300
+000008 4510 C038      00038           9+         BAL   1,IHB0002A                                               00049400
+00000C 002B                          10+         DC    AL2(43)                 TEXT LENGTH                      00058600
+00000E 0000                          11+         DC    B'0000000000000000'                                     X00058700
+                                       +                                                                       X00058800
+                                       +                                       MCS FLAGS                        00058900
+000010 E9C2D9C9C4C7C540              12+         DC    C'ZBRIDGE TEST E1 WTO REACHED THE CONSOLE' MESSAGE TEXT  00059100
+000038                               13+IHB0002A DS    0H                                                       00064300
+000038 0A23                          14+         SVC   035                                                      00064600
+                                     15          RETURN (14,12),RC=0
+00003A 98EC D00C      0000C          16+         LM    14,12,12(13)                      RESTORE THE REGISTERS  00650000
+00003E 41F0 0000      00000          17+         LA    15,0(0,0)                         LOAD RETURN CODE       01750000
+000042 07FE                          18+         BR    14                                RETURN                 02000000
+                                     19          END                                                  CROSS-REFERENCE                                              PAGE    3
+
+
+SYMBOL    LEN   VALUE   DEFN    REFERENCES                                                       ASM 0201 15.27 07/26/26
+
+IHB0002A 00002 00000038 00013  00009
+ZBE1WTO  00001 00000000 00001  00006                                                  ASSEMBLER DIAGNOSTICS AND STATISTICS                         PAGE    4
+
+
+                                                                                                 ASM 0201 15.27 07/26/26
+
+NO STATEMENTS FLAGGED IN THIS ASSEMBLY
+HIGHEST SEVERITY WAS    0
+OPTIONS FOR THIS ASSEMBLY
+  ALIGN, ALOGIC, BUFSIZE(STD), NODECK, ESD, FLAG(0), LINECOUNT(55), LIST, NOMCALL, YFLAG, WORKSIZE(2097152)
+  NOMLOGIC, NONUMBER, NOOBJECT, NORENT, RLD, NOSTMT, NOLIBMAC, NOTERMINAL, NOTEST, XREF(SHORT)
+  SYSPARM()
+WORK FILE BUFFER SIZE/NUMBER = 7678/ 1
+TOTAL RECORDS READ FROM SYSTEM INPUT          7
+TOTAL RECORDS READ FROM SYSTEM LIBRARY     1601
+TOTAL RECORDS PUNCHED                         0
+TOTAL RECORDS PRINTED                        43
+ F64-LEVEL LINKAGE EDITOR OPTIONS SPECIFIED XREF,LET,LIST,NCAL
+          DEFAULT OPTION(S) USED -  SIZE=(98304,55296)
+IEW0294  SYNAD EXIT                       ,ZBE1WTO ,LKED    ,293,DA,SYSLIN  ,READ  ,WRNG.LEN.RECORD,00000005000000,BSAM
+
+
+
+
+                                             DIAGNOSTIC MESSAGE DIRECTORY
+   IEW0294 ERROR - DDNAME PRINTED HAD SYNCHRONOUS ERROR.
+                        ZZZZZZZZZZZZ  BBBBBBBBBBB   EEEEEEEEEEEE       11       WW        WW  TTTTTTTTTTTT  OOOOOOOOOOOO
+                       ZZZZZZZZZZZZ  BBBBBBBBBBBB  EEEEEEEEEEEE      111       WW        WW  TTTTTTTTTTTT  OOOOOOOOOOOO
+                               ZZ   BB        BB  EE               1111       WW        WW       TT       OO        OO
+                             ZZ    BB        BB  EE                 11       WW        WW       TT       OO        OO
+                           ZZ     BB       BB   EE                 11       WW        WW       TT       OO        OO
+                      ZZZZZZZ    BBBBBBBBBB    EEEEEEEE           11       WW        WW       TT       OO        OO
+                     ZZZZZZZ    BBBBBBBBBB    EEEEEEEE           11       WW   WW   WW       TT       OO        OO
+                     ZZ        BB       BB   EE                 11       WW  WWWW  WW       TT       OO        OO
+                   ZZ         BB        BB  EE                 11       WW WW  WW WW       TT       OO        OO
+                 ZZ          BB        BB  EE                 11       WWWW    WWWW       TT       OO        OO
+               ZZZZZZZZZZZ  BBBBBBBBBBBB  EEEEEEEEEEEE   1111111111   WWW      WWW       TT       OOOOOOOOOOOO
+             ZZZZZZZZZZZZ  BBBBBBBBBBB   EEEEEEEEEEEE   1111111111   WW        WW       TT       OOOOOOOOOOOO
+
+
+
+                    JJJJJJJJJJ        444                                                              AAAAAAAAAA
+                    JJJJJJJJJJ       4444                                                             AAAAAAAAAAAA
+                        JJ          44 44                                                             AA        AA
+                        JJ         44  44                                                             AA        AA
+                        JJ        44   44                                                             AA        AA
+                        JJ       44444444444                                                          AAAAAAAAAAAA
+                        JJ      444444444444                                                          AAAAAAAAAAAA
+                        JJ             44                                                             AA        AA
+                  JJ    JJ             44                                                             AA        AA
+                  JJ    JJ             44                                                             AA        AA
+                  JJJJJJJJ             44                                                             AA        AA
+                   JJJJJJ              44                                                             AA        AA
+
+
+****A   END   JOB    4  ZBE1WTO   WTO TO CONSOLE        ROOM        3.27.58 PM 26 JUL 26  PRINTER1  SYS TK5R  JOB    4   END   A****
+****A   END   JOB    4  ZBE1WTO   WTO TO CONSOLE        ROOM        3.27.58 PM 26 JUL 26  PRINTER1  SYS TK5R  JOB    4   END   A****
+****A   END   JOB    4  ZBE1WTO   WTO TO CONSOLE        ROOM        3.27.58 PM 26 JUL 26  PRINTER1  SYS TK5R  JOB    4   END   A****
+****A   END   JOB    4  ZBE1WTO   WTO TO CONSOLE        ROOM        3.27.58 PM 26 JUL 26  PRINTER1  SYS TK5R  JOB    4   END   A****
+

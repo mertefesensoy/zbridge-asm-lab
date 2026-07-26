@@ -1,8 +1,21 @@
 # Runbook · TK5 (MVS 3.8j under Hercules) on Windows — Track M setup to rung E0
 
-**Date:** 2026-07-25
-**Status:** written, not yet executed
+**Date:** 2026-07-25, executed 2026-07-26
+**Status:** **E0 PASSED 2026-07-26** — but by a different route than this document
+describes. See §12, added after execution.
 **Governing decision:** `docs/decisions/0001-emulation-strategy-hercules-two-track.md`
+**Evidence:** `docs/evidence/E0-tk5-boot-2026-07-26.md`
+
+> ## Read §12 first
+>
+> This runbook describes a **Windows, interactive, 3270-terminal** path. E0 was
+> passed on 2026-07-26 by a **WSL2, headless, socket-reader** path instead, which
+> eliminates three of the five traps below and needs no terminal client and no
+> operator. **§12 has the procedure that actually ran**, every ⚠ VERIFY item answered
+> from TK5's own configuration files, and two new traps this environment adds.
+>
+> §1–§11 are retained unchanged: they remain correct for a Windows install, and the
+> traps they document are real. Where they disagree with §12, §12 is what was tested.
 
 ---
 
@@ -316,8 +329,123 @@ E1 has its own runbook, written once E0's ⚠ VERIFY findings are in.
 
 ---
 
+## §12 · What actually ran — the headless WSL2 procedure (added 2026-07-26, E0 PASSED)
+
+E0 passed with **no 3270 terminal, no operator, and no Windows install.** TK5 bundles
+Linux startup scripts *and* a Linux x86-64 Hercules binary, so the whole system runs
+inside WSL2 on ext4.
+
+### Why this route is better than §1–§7
+
+| §1 trap | Under WSL2 / ext4 |
+|---|---|
+| Trap 1 — never install under OneDrive | **Gone.** ext4 inside the WSL VHD; OneDrive cannot see it |
+| Trap 2 — path characters and spaces | **Gone.** `/root/mvs-tk5` |
+| Trap 3 — antivirus scanning DASD | **Gone in practice.** Defender does not real-time scan inside the WSL2 VHD |
+| Trap 4 — Windows firewall prompt | **Not encountered.** Ports bind in the WSL network namespace |
+| Trap 5 — never stop the emulator to stop the system | **Fully applies, and bit us three times.** See Trap 7 |
+
+Do **not** install under `/mnt/c`: DASD I/O across the 9p boundary is slow and it
+reintroduces Traps 1–3.
+
+### 🛑 TRAP 6 (new) — WSL2 idles its VM out, and `/tmp` is tmpfs
+
+An idle-out while Hercules holds buffered DASD writes is Trap 5 by another route. Keep
+everything under `/root`, never `/tmp`, and **leave the system shut down between
+sessions** rather than running.
+
+### 🛑 TRAP 7 (new) — a detached Hercules dies on stdin EOF
+
+Hercules reads console commands from stdin. If stdin is a FIFO held open by a helper
+process and that helper is reaped with its process group, Hercules sees EOF and exits
+**without running MVS's shutdown**. This produced three unclean stops on 2026-07-26.
+
+Rules that follow, and they are not optional:
+
+1. **`HHC01412I Hercules terminated` is the only accepted proof of a clean stop.**
+   Process absence proves nothing — it is equally consistent with a kill mid-write.
+2. **Release the stdin holder only after that message appears.**
+3. **Assert exactly one instance** before touching the tree:
+   `pgrep -cf 'hercules -f conf/tk5.cnf'` must be `1`. Never modify the tree while any
+   instance is live — two emulators on one set of CCKD volumes makes the state
+   untrustworthy however either stopped.
+
+### The procedure
+
+```bash
+# One-time: fetch and unpack. Record the hash — it is what makes recovery cheap.
+mkdir -p /root/tk5dl && cd /root/tk5dl
+curl -fL -o mvs-tk5.zip https://www.prince-webdesign.nl/images/downloads/mvs-tk5.zip
+sha256sum mvs-tk5.zip     # 710d002843631322810a276dd42c793fda458548dc64d86e2914a62db7425f84
+unzip -q mvs-tk5.zip -d /root/ && chmod -R +x /root/mvs-tk5
+```
+
+```bash
+# IPL, headless. TK5's scripts/ipl.rc arms HAO before the IPL, so IEA101A and IEA305A
+# are answered automatically and no operator is needed.
+T=/root/mvs-tk5; cd $T
+mkfifo /root/tk5.fifo
+echo CONSOLE > unattended/mode
+export PATH="$T/hercules/linux/64/bin:$PATH"
+export LD_LIBRARY_PATH="$T/hercules/linux/64/lib:$T/hercules/linux/64/lib/hercules"
+export HERCULES_RC=scripts/ipl.rc
+setsid nohup bash -c 'exec sleep infinity > /root/tk5.fifo' &
+setsid nohup hercules -f conf/tk5.cnf < /root/tk5.fifo >> log/3033.log 2>&1 &
+# ready when log/3033.log contains: IEE136I LOCAL:   (~15-30s)
+```
+
+```bash
+# Submit a job through the socket card reader. No terminal, no netcat needed.
+cat job.jcl > /dev/tcp/127.0.0.1/3505
+# output appears in prt/prt00e.txt ; console in log/3033.log ; hardcopy in log/hardcopy.log
+```
+
+```bash
+# Clean shutdown. Wait for HHC01412I BEFORE releasing the stdin holder.
+echo "script scripts/shutdown" > /root/tk5.fifo
+until grep -q 'HHC01412I Hercules terminated' log/3033.log; do sleep 5; done
+pkill -f 'sleep infinity'; rm -f /root/tk5.fifo
+```
+
+### Every ⚠ VERIFY item, answered from `conf/tk5.cnf` and the bundled scripts
+
+| Item | Answer |
+|---|---|
+| Hercules version | **4.9.1.0-SDL** (SDL Hyperion), built 2025-12-08. **A Linux x86-64 build ships in `hercules/linux/64/bin/hercules`** |
+| Disk | **593 MB unpacked**, 498 MB zip — not the ~2 GB budgeted |
+| §3 unattended IPL? | **Fully unattended.** `scripts/ipl.rc` uses HAO (`hao tgt IEA101A`, `hao tgt IEA305A`) to auto-reply. `IEA101A` appearing is normal, not a hang |
+| §4 3270 client | **Not needed for E0–E3.** Socket reader + printer files replace it entirely |
+| §4 console port | **3270 confirmed** (`CNSLPORT ${CNSLPORT:=3270}`) |
+| §8 card reader | **Port 3505 confirmed** (`000C 3505 ${RDRPORT:=3505} sockdev ascii trunc eof`) |
+| §8 printer | **1403 is a device *type*, not a port.** Printers write to files: `000E`→`prt/prt00e.txt`, `000F`→`prt/prt00f.txt`, `0002`→`prt/prt002.txt`, `030E`→`log/hardcopy.log` |
+| §5 credentials | **Not needed for E0** — no logon was performed. Still unverified |
+| §6 shutdown | **`scripts/shutdown`**, drivable from the Hercules console; also `quiesce`, `poweroff`, `z_eod` |
+| CPU config | `CPUMODEL 3033`, `CPUSERIAL 000611`, `ARCHLVL S/370`, `MAINSIZE 16`, `NUMCPU 1` |
+| Bonus | `HTTP PORT 8038` with `HTTP START` — Hercules serves a web console |
+| §2 licence terms | **The TK5 download page states none for MVS 3.8j.** ADR 0001's evidence item 3 rests on its original sources, not on that page |
+
+### §8's automation was not built after E0 — it *was* E0
+
+The design note in §8 says to build the socket-reader pipeline only once E0 passes by
+hand. In practice E0 was passed *by* that pipeline, so it is already proven end to end:
+JCL file → port 3505 → JES2 → `prt/prt00e.txt` → `docs/evidence/`. What remains for a
+`Submit-MvsJob` wrapper is packaging, not discovery.
+
+### What E1 needs next
+
+E1 assembles a program using the `WTO` macro and captures the listing — **the listing is
+the ground-truth source for the WTO parameter-list byte layout**, which has no primary
+citation on any system. Two constraints to carry in:
+
+- **The assembler is IFOX00 (Assembler XF), not HLASM** (ADR 0001 evidence item 6): no
+  dependent or named `USING`, no long displacement, no relative-immediate forms.
+- **`log/hardcopy.log` (device `030E`) is where a WTO message lands as a file.** That is
+  what makes E1's console evidence capturable without a screenshot.
+
 ## Links
 
+- `docs/evidence/E0-tk5-boot-2026-07-26.md` — the E0 evidence, including the three
+  unclean stops and the corrections adopted
 - `docs/decisions/0001-emulation-strategy-hercules-two-track.md` — why Track M exists
 - `docs/hypotheses/001-mvs38j-svc35-wto-oracle.md` — what E1–E3 are testing
 - TK5: <https://www.prince-webdesign.nl/tk5>

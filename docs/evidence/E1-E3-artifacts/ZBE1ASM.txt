@@ -1,0 +1,261 @@
+                        ZZZZZZZZZZZZ  BBBBBBBBBBB   EEEEEEEEEEEE       11        AAAAAAAAAA    SSSSSSSSSS   MM        MM
+                       ZZZZZZZZZZZZ  BBBBBBBBBBBB  EEEEEEEEEEEE      111       AAAAAAAAAAAA  SSSSSSSSSSSS  MMM      MMM
+                               ZZ   BB        BB  EE               1111       AA        AA  SS        SS  MMMM    MMMM
+                             ZZ    BB        BB  EE                 11       AA        AA  SS            MM MM  MM MM
+                           ZZ     BB       BB   EE                 11       AA        AA  SSS           MM  MMMM  MM
+                      ZZZZZZZ    BBBBBBBBBB    EEEEEEEE           11       AAAAAAAAAAAA   SSSSSSSSS    MM   MM   MM
+                     ZZZZZZZ    BBBBBBBBBB    EEEEEEEE           11       AAAAAAAAAAAA    SSSSSSSSS   MM        MM
+                     ZZ        BB       BB   EE                 11       AA        AA           SSS  MM        MM
+                   ZZ         BB        BB  EE                 11       AA        AA            SS  MM        MM
+                 ZZ          BB        BB  EE                 11       AA        AA  SS        SS  MM        MM
+               ZZZZZZZZZZZ  BBBBBBBBBBBB  EEEEEEEEEEEE   1111111111   AA        AA  SSSSSSSSSSSS  MM        MM
+             ZZZZZZZZZZZZ  BBBBBBBBBBB   EEEEEEEEEEEE   1111111111   AA        AA   SSSSSSSSSS   MM        MM
+
+
+
+                    JJJJJJJJJJ   3333333333                                                            AAAAAAAAAA
+                    JJJJJJJJJJ  333333333333                                                          AAAAAAAAAAAA
+                        JJ      33        33                                                          AA        AA
+                        JJ                33                                                          AA        AA
+                        JJ                33                                                          AA        AA
+                        JJ             3333                                                           AAAAAAAAAAAA
+                        JJ             3333                                                           AAAAAAAAAAAA
+                        JJ                33                                                          AA        AA
+                  JJ    JJ                33                                                          AA        AA
+                  JJ    JJ      33        33                                                          AA        AA
+                  JJJJJJJJ      333333333333                                                          AA        AA
+                   JJJJJJ        3333333333                                                           AA        AA
+
+
+****A  START  JOB    3  ZBE1ASM   WTO MACRO EXPANSION   ROOM        3.25.55 PM 26 JUL 26  PRINTER1  SYS TK5R  JOB    3  START  A****
+****A  START  JOB    3  ZBE1ASM   WTO MACRO EXPANSION   ROOM        3.25.55 PM 26 JUL 26  PRINTER1  SYS TK5R  JOB    3  START  A****
+****A  START  JOB    3  ZBE1ASM   WTO MACRO EXPANSION   ROOM        3.25.55 PM 26 JUL 26  PRINTER1  SYS TK5R  JOB    3  START  A****
+****A  START  JOB    3  ZBE1ASM   WTO MACRO EXPANSION   ROOM        3.25.55 PM 26 JUL 26  PRINTER1  SYS TK5R  JOB    3  START  A****
+                                                J E S 2   J O B   L O G
+
+
+15.25.55 JOB    3  $HASP373 ZBE1ASM  STARTED - INIT  1 - CLASS A - SYS TK5R
+15.25.55 JOB    3  IEF403I ZBE1ASM - STARTED - TIME=15.25.55
+15.25.55 JOB    3  IEFACTRT - Stepname  Procstep  Program   Retcode
+15.25.55 JOB    3  ZBE1ASM    ASM       ASM       IFOX00    RC= 0000
+15.25.55 JOB    3  IEF404I ZBE1ASM - ENDED - TIME=15.25.55
+15.25.55 JOB    3  $HASP395 ZBE1ASM  ENDED
+
+
+------ JES2 JOB STATISTICS ------
+
+
+ 26 JUL 26 JOB EXECUTION DATE
+
+
+        44 CARDS READ
+
+
+       169 SYSOUT PRINT RECORDS
+
+
+         0 SYSOUT PUNCH RECORDS
+
+
+      0.00 MINUTES EXECUTION TIME
+    1     //ZBE1ASM  JOB (ZBRIDGE),'WTO MACRO EXPANSION',CLASS=A,MSGCLASS=A,      JOB    3
+          //             MSGLEVEL=(1,1)
+          ***
+          *** zbridge-asm-lab rung E1, the decisive step.
+          ***
+          *** Gemini research brief 003 Q6: no IBM publication prints the generated
+          *** expansion of the WTO macro. Users are expected to assemble with the
+          *** PRINT GEN assembler option and read the authoritative expansion.
+          *** This job does exactly that.
+          ***
+          *** PRINT ON,GEN,DATA is deliberate:
+          ***   GEN  - show macro-generated statements, not just the macro call
+          ***   DATA - show the FULL object code of DC statements. Without it the
+          ***          assembler truncates constants in the listing and the message
+          ***          text bytes would be cut off.
+          ***
+          *** Three forms are assembled so the differences are visible side by side:
+          ***   WPLMIN  the minimal single-line WTO parameter list
+          ***   WPLFULL the same with ROUTCDE and DESC supplied
+          ***   WPLLONG a longer text, to show how the length field tracks it
+          ***
+    2     //ASM      EXEC ASMFC,PARM.ASM='LIST,NODECK'
+    3     XXASMFC    PROC  MAC='SYS1.MACLIB',MAC1='SYS1.MACLIB',                  00000100
+          XX         MAC2='SYS1.MACLIB',MAC3='SYS1.MACLIB',SOUT='*'               00000200
+    4     XXASM      EXEC  PGM=IFOX00,REGION=128K                                 00000300
+    5     XXSYSLIB   DD    DSN=&MAC,DISP=SHR                                      00000400
+    6     XX         DD    DSN=&MAC1,DISP=SHR                                     00000500
+    7     XX         DD    DSN=&MAC2,DISP=SHR                                     00000600
+    8     XX         DD    DSN=&MAC3,DISP=SHR                                     00000700
+    9     XXSYSUT1   DD    DSN=&&SYSUT1,UNIT=SYSSQ,SPACE=(1700,(600,100)),        00000800
+          XX             SEP=(SYSLIB)                                             00000900
+   10     XXSYSUT2   DD    DSN=&&SYSUT2,UNIT=SYSSQ,SPACE=(1700,(300,50)),         00001000
+          XX             SEP=(SYSLIB,SYSUT1)                                      00001100
+   11     XXSYSUT3   DD    DSN=&&SYSUT3,UNIT=SYSSQ,SPACE=(1700,(300,50))          00001200
+   12     XXSYSPRINT DD    SYSOUT=&SOUT,DCB=BLKSIZE=1089                          00001300
+   13     XXSYSPUNCH DD    SYSOUT=B                                               00001400
+   14     //ASM.SYSIN DD  *
+ STMT NO. MESSAGE
+-
+    5     IEF653I SUBSTITUTION JCL - DSN=SYS1.MACLIB,DISP=SHR
+    6     IEF653I SUBSTITUTION JCL - DSN=SYS1.MACLIB,DISP=SHR
+    7     IEF653I SUBSTITUTION JCL - DSN=SYS1.MACLIB,DISP=SHR
+    8     IEF653I SUBSTITUTION JCL - DSN=SYS1.MACLIB,DISP=SHR
+   12     IEF653I SUBSTITUTION JCL - SYSOUT=*,DCB=BLKSIZE=1089
+IEF236I ALLOC. FOR ZBE1ASM ASM ASM
+IEF237I 390  ALLOCATED TO SYSLIB
+IEF237I 390  ALLOCATED TO
+IEF237I 390  ALLOCATED TO
+IEF237I 390  ALLOCATED TO
+IEF237I 292  ALLOCATED TO SYSUT1
+IEF237I 290  ALLOCATED TO SYSUT2
+IEF237I 291  ALLOCATED TO SYSUT3
+IEF237I JES2 ALLOCATED TO SYSPRINT
+IEF237I JES2 ALLOCATED TO SYSPUNCH
+IEF237I JES2 ALLOCATED TO SYSIN
+IEF142I ZBE1ASM ASM ASM - STEP WAS EXECUTED - COND CODE 0000
+IEF285I   SYS1.MACLIB                                  KEPT          *--------9
+IEF285I   VOL SER NOS= TK5RES.
+IEF285I   SYS1.MACLIB                                  KEPT          *--------0
+IEF285I   VOL SER NOS= TK5RES.
+IEF285I   SYS1.MACLIB                                  KEPT          *--------0
+IEF285I   VOL SER NOS= TK5RES.
+IEF285I   SYS1.MACLIB                                  KEPT          *--------0
+IEF285I   VOL SER NOS= TK5RES.
+IEF285I   SYS26207.T152555.RA000.ZBE1ASM.SYSUT1        DELETED       *-------85
+IEF285I   VOL SER NOS= WORK03.
+IEF285I   SYS26207.T152555.RA000.ZBE1ASM.SYSUT2        DELETED       *-------16
+IEF285I   VOL SER NOS= WORK01.
+IEF285I   SYS26207.T152555.RA000.ZBE1ASM.SYSUT3        DELETED       *--------8
+IEF285I   VOL SER NOS= WORK02.
+IEF285I   JES2.JOB00003.SO0102                         SYSOUT
+IEF285I   JES2.JOB00003.SO0103                         SYSOUT
+IEF285I   JES2.JOB00003.SI0101                         SYSIN
+IEF373I STEP /ASM     / START 26207.1525
+IEF374I STEP /ASM     / STOP  26207.1525 CPU    0MIN 00.06SEC SRB    0MIN 00.01SEC VIRT   128K SYS   188K
+************************************************************************************************************************************
+*     1. Jobstep of job: ZBE1ASM     Stepname: ASM         Program name: IFOX00     Executed on 26.07.26 from 15.25.55 to 15.25.55 *
+*         elapsed time  00:00:00,11                      CPU-Identifier:  TK5R           Page-in:      0                           *
+*             CPU time  00:00:00,07               Virtual Storage used:    128K         Page-out:      0                           *
+*           corr. CPU:  00:00:00,07   CPU time has been corrected by  1 / 1,0  multiplier                                          *
+*                                                                                                                                  *
+*     I/O Operation                                                                                                                *
+*     Number of records read via DD * or DD DATA:     20                                                                           *
+*     390.......9 390.......0 390.......0 390.......0 292......85 290......16 291.......8 DMY.......0 DMY.......0 DMY.......0      *
+*                                                                                                                                  *
+*                                          Charge for step (w/o SYSOUT):          0,11                                             *
+************************************************************************************************************************************
+IEF375I  JOB /ZBE1ASM / START 26207.1525
+IEF376I  JOB /ZBE1ASM / STOP  26207.1525 CPU    0MIN 00.06SEC SRB    0MIN 00.01SEC
+                                               EXTERNAL SYMBOL DICTIONARY                                      PAGE    1
+
+
+SYMBOL   TYPE  ID   ADDR  LENGTH LDID                                                            ASM 0201 15.25 07/26/26
+
+ZBE1WPL   SD  0001 000000 00005E                                                                                                               PAGE    2
+
+
+  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                       ASM 0201 15.25 07/26/26
+
+000000                                1 ZBE1WPL  CSECT
+                                      2          PRINT ON,GEN,DATA
+                                      3 *
+                                      4 * ---------------------------------------------------------------
+                                      5 * Form 1: minimal single-line WTO, list form.
+                                      6 * ---------------------------------------------------------------
+                                      7 WPLMIN   WTO   'ZBRIDGE TEST HELLO',MF=L
+000000                                8+WPLMIN   DC    0F'0'                                                    00049700
+000000 0016                           9+         DC    AL2(22)                 TEXT LENGTH                      00058600
+000002 0000                          10+         DC    B'0000000000000000'                                     X00058700
+                                       +                                                                       X00058800
+                                       +                                       MCS FLAGS                        00058900
+000004 E9C2D9C9C4C7C540              11+         DC    C'ZBRIDGE TEST HELLO'   MESSAGE TEXT                     00059100
+00000C E3C5E2E340C8C5D3
+000014 D3D6
+                                     12 *
+                                     13 * ---------------------------------------------------------------
+                                     14 * Form 2: with routing and descriptor codes.
+                                     15 * ---------------------------------------------------------------
+                                     16 WPLFULL  WTO   'ZBRIDGE TEST HELLO',ROUTCDE=(11),DESC=(7),MF=L
+000016 0000
+000018                               17+WPLFULL  DC    0F'0'                                                    00049700
+000018 0016                          18+         DC    AL2(22)                 TEXT LENGTH                      00058600
+00001A 8000                          19+         DC    B'1000000000000000'                                     X00058700
+                                       +                                                                       X00058800
+                                       +                                       MCS FLAGS                        00058900
+00001C E9C2D9C9C4C7C540              20+         DC    C'ZBRIDGE TEST HELLO'   MESSAGE TEXT                     00059100
+000024 E3C5E2E340C8C5D3
+00002C D3D6
+00002E 0200                          21+         DC    B'0000001000000000'                                     X00059300
+                                       +                                                                       X00059400
+                                       +                                       DESCRIPTOR CODES                 00059500
+000030 0020                          22+         DC    B'0000000000100000'                                     X00059600
+                                       +                                                                       X00059700
+                                       +                                       ROUTING CODES                    00059800
+                                     23 *
+                                     24 * ---------------------------------------------------------------
+                                     25 * Form 3: a different text length, so the length field can be
+                                     26 * compared against the text it describes.
+                                     27 * ---------------------------------------------------------------
+                                     28 WPLLONG  WTO   'ZBRIDGE TEST A LONGER OPERATOR MESSAGE',MF=L
+000032 0000
+000034                               29+WPLLONG  DC    0F'0'                                                    00049700
+000034 002A                          30+         DC    AL2(42)                 TEXT LENGTH                      00058600
+000036 0000                          31+         DC    B'0000000000000000'                                     X00058700
+                                       +                                                                       X00058800
+                                       +                                       MCS FLAGS                        00058900
+000038 E9C2D9C9C4C7C540              32+         DC    C'ZBRIDGE TEST A LONGER OPERATOR MESSAGE' MESSAGE TEXT   00059100
+000040 E3C5E2E340C140D3
+000048 D6D5C7C5D940D6D7
+000050 C5D9C1E3D6D940D4
+000058 C5E2E2C1C7C5
+                                     33 *
+                                     34          END                                                  ASSEMBLER DIAGNOSTICS AND STATISTICS                         PAGE    3
+
+
+                                                                                                 ASM 0201 15.25 07/26/26
+
+NO STATEMENTS FLAGGED IN THIS ASSEMBLY
+HIGHEST SEVERITY WAS    0
+OPTIONS FOR THIS ASSEMBLY
+  ALIGN, ALOGIC, BUFSIZE(STD), NODECK, ESD, FLAG(0), LINECOUNT(55), LIST, NOMCALL, YFLAG, WORKSIZE(2097152)
+  NOMLOGIC, NONUMBER, NOOBJECT, NORENT, RLD, NOSTMT, NOLIBMAC, NOTERMINAL, NOTEST, XREF(SHORT)
+  SYSPARM()
+WORK FILE BUFFER SIZE/NUMBER = 7678/ 1
+TOTAL RECORDS READ FROM SYSTEM INPUT         20
+TOTAL RECORDS READ FROM SYSTEM LIBRARY     1468
+TOTAL RECORDS PUNCHED                         0
+TOTAL RECORDS PRINTED                        72                        ZZZZZZZZZZZZ  BBBBBBBBBBB   EEEEEEEEEEEE       11        AAAAAAAAAA    SSSSSSSSSS   MM        MM
+                       ZZZZZZZZZZZZ  BBBBBBBBBBBB  EEEEEEEEEEEE      111       AAAAAAAAAAAA  SSSSSSSSSSSS  MMM      MMM
+                               ZZ   BB        BB  EE               1111       AA        AA  SS        SS  MMMM    MMMM
+                             ZZ    BB        BB  EE                 11       AA        AA  SS            MM MM  MM MM
+                           ZZ     BB       BB   EE                 11       AA        AA  SSS           MM  MMMM  MM
+                      ZZZZZZZ    BBBBBBBBBB    EEEEEEEE           11       AAAAAAAAAAAA   SSSSSSSSS    MM   MM   MM
+                     ZZZZZZZ    BBBBBBBBBB    EEEEEEEE           11       AAAAAAAAAAAA    SSSSSSSSS   MM        MM
+                     ZZ        BB       BB   EE                 11       AA        AA           SSS  MM        MM
+                   ZZ         BB        BB  EE                 11       AA        AA            SS  MM        MM
+                 ZZ          BB        BB  EE                 11       AA        AA  SS        SS  MM        MM
+               ZZZZZZZZZZZ  BBBBBBBBBBBB  EEEEEEEEEEEE   1111111111   AA        AA  SSSSSSSSSSSS  MM        MM
+             ZZZZZZZZZZZZ  BBBBBBBBBBB   EEEEEEEEEEEE   1111111111   AA        AA   SSSSSSSSSS   MM        MM
+
+
+
+                    JJJJJJJJJJ   3333333333                                                            AAAAAAAAAA
+                    JJJJJJJJJJ  333333333333                                                          AAAAAAAAAAAA
+                        JJ      33        33                                                          AA        AA
+                        JJ                33                                                          AA        AA
+                        JJ                33                                                          AA        AA
+                        JJ             3333                                                           AAAAAAAAAAAA
+                        JJ             3333                                                           AAAAAAAAAAAA
+                        JJ                33                                                          AA        AA
+                  JJ    JJ                33                                                          AA        AA
+                  JJ    JJ      33        33                                                          AA        AA
+                  JJJJJJJJ      333333333333                                                          AA        AA
+                   JJJJJJ        3333333333                                                           AA        AA
+
+
+****A   END   JOB    3  ZBE1ASM   WTO MACRO EXPANSION   ROOM        3.25.55 PM 26 JUL 26  PRINTER1  SYS TK5R  JOB    3   END   A****
+****A   END   JOB    3  ZBE1ASM   WTO MACRO EXPANSION   ROOM        3.25.55 PM 26 JUL 26  PRINTER1  SYS TK5R  JOB    3   END   A****
+****A   END   JOB    3  ZBE1ASM   WTO MACRO EXPANSION   ROOM        3.25.55 PM 26 JUL 26  PRINTER1  SYS TK5R  JOB    3   END   A****
+****A   END   JOB    3  ZBE1ASM   WTO MACRO EXPANSION   ROOM        3.25.55 PM 26 JUL 26  PRINTER1  SYS TK5R  JOB    3   END   A****
+

@@ -1,5 +1,36 @@
 # Research Brief 003 · Where the WTO parameter list is *actually* documented, and what comes back in R15
 
+> ## STATUS: ANSWERED (PARTIAL) and ACTED ON — 2026-07-26
+>
+> **Q1, Q2, Q4 FOUND. Q3, Q5, Q6 NOT FOUND.** Return verbatim in
+> `research/003-wto-wpl-layout-source-and-return-code-contract.md`.
+>
+> **Q1's substance held and its detail did not.** The claim that the layout is documented
+> only by the `IEZWPL` mapping macro is correct and was the key that unblocked the project.
+> But Q1 said the macro ships "typically" in `SYS1.MACLIB`, and job `ZBE1MAC` proved it is
+> **not there on TK5** (`IEB408I MEMBER IEZWPL CANNOT BE FOUND`, RC=0008). Second return in
+> a row whose library/page detail failed checking — the lesson holds: verify the form
+> number, then verify the page.
+>
+> **Q6 was the actionable answer.** No IBM publication prints the macro expansion; `PRINT
+> GEN` is the authoritative instrument. Acting on that produced the layout on 2026-07-26:
+> `docs/evidence/E1-E3-wto-layout-and-svc35-2026-07-26.md`.
+>
+> **Q3 partially closed by our own evidence.** The macro expansion attests MCS flag bit 0
+> (`0x8000`) = descriptor and routing halfwords follow the text. The other fifteen bits
+> remain uncited, which is why `zbridge/console` refuses routing options.
+>
+> **Q4 resolved a real divergence and settled an open ADR question.** MVS 3.8j issues no
+> return code for a single-line WTO; z/OS does, in R15. So rung E3 **cannot** retire Phase
+> 3b step 6 — the doubt recorded against ADR 0001 §6 on 2026-07-25 was correct.
+>
+> **Audit weakness to note:** the z/OS-side citations name manuals without form numbers
+> (*z/OS MVS Data Areas*, *Authorized Assembler Services Reference*). The "(SET-WTO)" hint
+> is consistent with volume 4 of that set, but no form number was supplied and none was
+> independently verified.
+
+
+
 - Status: **ANSWERED** — returned 2026-07-26
 - Date: 2026-07-25
 - Requested by: Claude (architecture role)

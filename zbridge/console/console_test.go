@@ -8,35 +8,32 @@ import (
 	"github.com/mertefesensoy/zbridge"
 )
 
-// These tests run on every platform. That is the point of the E3 seam: the
-// parts of the WTO path that do not need z/OS are tested on a laptop.
+// These tests run on every platform. That is the point of the E3 seam: the parts
+// of the WTO path that do not need z/OS are tested on a laptop.
+//
+// The byte-exact comparison against IBM's own macro expansion lives in
+// wpl_oracle_test.go, which is the stronger test. This file covers the
+// surrounding behaviour: validation, option handling, mask arithmetic, and the
+// platform boundary.
 
-func TestEncodeWPLRefusesRatherThanGuesses(t *testing.T) {
-	_, err := EncodeWPL("ZBRIDGE TEST HELLO")
-	if err == nil {
-		t.Fatal("EncodeWPL returned a parameter list, but the WPL layout has no primary citation; returning bytes here would be a guess")
+// TestEncodeWPLSucceedsForTheMinimalForm replaces an earlier test that asserted
+// EncodeWPL must NOT return bytes. That assertion was correct while the layout
+// had no primary citation, and became obsolete on 2026-07-26 when the layout was
+// read out of the IFOX00 expansion of IBM's WTO macro on MVS 3.8j.
+func TestEncodeWPLSucceedsForTheMinimalForm(t *testing.T) {
+	msg := "ZBRIDGE TEST HELLO"
+	buf, err := EncodeWPL(msg)
+	if err != nil {
+		t.Fatalf("EncodeWPL returned %v", err)
 	}
-	if !errors.Is(err, zbridge.ErrLayoutUnverified) {
-		t.Errorf("EncodeWPL error = %v, want ErrLayoutUnverified", err)
-	}
-
-	var zerr *zbridge.Error
-	if !errors.As(err, &zerr) {
-		t.Fatalf("EncodeWPL error is %T, want *zbridge.Error", err)
-	}
-	if zerr.Unknown != "U2" {
-		t.Errorf("blocked-on unknown = %q, want %q", zerr.Unknown, "U2")
-	}
-	if zerr.HasCode {
-		t.Error("HasCode is true, but no service was invoked and no return code exists")
+	if len(buf) != len(msg)+4 {
+		t.Errorf("buffer is %d bytes, want %d", len(buf), len(msg)+4)
 	}
 }
 
-// TestValidationHappensBeforeTheLayoutError is the test that keeps the refusal
-// honest. If EncodeWPL simply returned ErrLayoutUnverified as its first
-// statement, the validation code would be dead and would rot unnoticed until the
-// layout landed. Bad input must produce a validation error, not the layout error.
-func TestValidationHappensBeforeTheLayoutError(t *testing.T) {
+// TestValidationRunsBeforeEncoding keeps the validation path honest: bad input
+// must produce a specific validation error, not a silently mangled buffer.
+func TestValidationRunsBeforeEncoding(t *testing.T) {
 	cases := []struct {
 		name string
 		msg  string
@@ -49,9 +46,9 @@ func TestValidationHappensBeforeTheLayoutError(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			_, err := EncodeWPL(c.msg)
+			buf, err := EncodeWPL(c.msg)
 			if err == nil {
-				t.Fatal("expected an error")
+				t.Fatalf("EncodeWPL accepted invalid input and returned % X", buf)
 			}
 			if errors.Is(err, zbridge.ErrLayoutUnverified) {
 				t.Errorf("got the layout error for invalid input %q; validation must run first", c.msg)
@@ -61,35 +58,53 @@ func TestValidationHappensBeforeTheLayoutError(t *testing.T) {
 }
 
 func TestMaxTextLenBoundary(t *testing.T) {
-	// Exactly at the limit must pass validation and fail only on the layout.
-	_, err := EncodeWPL(strings.Repeat("x", MaxTextLen))
-	if !errors.Is(err, zbridge.ErrLayoutUnverified) {
-		t.Errorf("a message of exactly MaxTextLen (%d) failed validation: %v", MaxTextLen, err)
+	// Exactly at the limit must be accepted.
+	if _, err := EncodeWPL(strings.Repeat("x", MaxTextLen)); err != nil {
+		t.Errorf("a message of exactly MaxTextLen (%d) was rejected: %v", MaxTextLen, err)
 	}
 
 	// One over must fail validation.
-	_, err = EncodeWPL(strings.Repeat("x", MaxTextLen+1))
+	_, err := EncodeWPL(strings.Repeat("x", MaxTextLen+1))
 	if !errors.Is(err, zbridge.ErrMessageTooLong) {
 		t.Errorf("MaxTextLen+1 error = %v, want ErrMessageTooLong", err)
 	}
 }
 
-func TestWTORefusesBeforeTrapping(t *testing.T) {
+// TestWTOStopsAtThePlatformBoundary. WTO now builds a real parameter list, so it
+// no longer fails on the layout — it fails because this is not z/OS. That is the
+// correct and honest outcome on a developer's laptop.
+func TestWTOStopsAtThePlatformBoundary(t *testing.T) {
 	err := WTO("ZBRIDGE TEST HELLO")
 	if err == nil {
 		t.Fatal("WTO returned nil on a platform where nothing has ever reached a console")
 	}
-	// The ordering matters: WTO must fail on the unverified layout BEFORE it
-	// reaches the platform stub. Trapping with a guessed parameter list is the
-	// failure mode this ordering exists to prevent.
-	if !errors.Is(err, zbridge.ErrLayoutUnverified) {
-		t.Errorf("WTO error = %v, want ErrLayoutUnverified (refuse before trapping)", err)
+	if !errors.Is(err, zbridge.ErrUnsupportedPlatform) {
+		t.Errorf("WTO error = %v, want ErrUnsupportedPlatform", err)
+	}
+
+	var zerr *zbridge.Error
+	if !errors.As(err, &zerr) {
+		t.Fatalf("WTO error is %T, want *zbridge.Error", err)
+	}
+	if zerr.HasCode {
+		t.Error("HasCode is true, but no service was invoked and no return code exists")
+	}
+}
+
+// TestWTORejectsBadInputBeforeThePlatformCheck. Ordering matters: a caller with a
+// bad message should learn that, not that they are on the wrong operating system.
+func TestWTORejectsBadInputBeforeThePlatformCheck(t *testing.T) {
+	err := WTO(strings.Repeat("x", MaxTextLen+1))
+	if !errors.Is(err, zbridge.ErrMessageTooLong) {
+		t.Errorf("WTO with an over-long message gave %v, want ErrMessageTooLong", err)
 	}
 }
 
 func TestRouteMask(t *testing.T) {
 	// Route codes are 1-based with code 1 as the most significant bit of a
-	// 16-bit mask. This is pure arithmetic and does not depend on the layout.
+	// 16-bit mask. IBM's macro expansion confirmed this convention directly:
+	// ROUTCDE=(11) generated B'0000000000100000' = 0x0020, which is what this
+	// implementation produces.
 	cases := []struct {
 		name  string
 		codes []RouteCode
@@ -98,6 +113,7 @@ func TestRouteMask(t *testing.T) {
 		{"none", nil, 0x0000},
 		{"route 1", []RouteCode{1}, 0x8000},
 		{"route 2", []RouteCode{2}, 0x4000},
+		{"route 11 (macro-confirmed)", []RouteCode{11}, 0x0020},
 		{"route 16", []RouteCode{16}, 0x0001},
 		{"routes 1 and 2", []RouteCode{1, 2}, 0xC000},
 		{"out of range ignored", []RouteCode{0, 17, 200}, 0x0000},
@@ -114,18 +130,19 @@ func TestRouteMask(t *testing.T) {
 	}
 }
 
+// TestDescriptorMask. IBM's macro expansion confirmed this too: DESC=(7)
+// generated B'0000001000000000' = 0x0200.
 func TestDescriptorMask(t *testing.T) {
-	o := resolve([]Option{WithDescriptor(DescEventualAction)})
-	// Descriptor code 3 -> bit 16-3 = 13 -> 0x2000
-	if got, want := o.descriptorMask(), uint16(0x2000); got != want {
-		t.Errorf("descriptorMask(3) = %#04x, want %#04x", got, want)
+	o := resolve([]Option{WithDescriptor(7)})
+	if got, want := o.descriptorMask(), uint16(0x0200); got != want {
+		t.Errorf("descriptorMask(7) = %#04x, want %#04x (as IBM's macro generated)", got, want)
 	}
 }
 
 // TestFormatDC checks the other half of the E3 seam. FormatDC output is pasted
 // straight into an MVS assembler program, so its shape matters: a label in
-// columns 1-8, DC starting in the operation field, and hex wrapped so the line
-// fits fixed-form source.
+// columns 1-8, DC in the operation field, and hex wrapped to fit fixed-form
+// source.
 func TestFormatDC(t *testing.T) {
 	got := FormatDC("WPL", []byte{0x00, 0x05, 0xC8, 0xC5, 0xD3, 0xD3, 0xD6})
 	want := "WPL      DC    X'0005C8C5D3D3D6'\n"
@@ -153,17 +170,5 @@ func TestFormatDCWraps(t *testing.T) {
 	}
 	if !strings.Contains(lines[2], "X'2021222324252627'") {
 		t.Errorf("last line %q does not hold the final 8 bytes", lines[2])
-	}
-}
-
-// TestLayoutStatusIsHonest guards the project's own convention. If someone sets
-// LayoutVerified to true without supplying a layout, EncodeWPL panics by design;
-// this test makes the inconsistency visible at test time instead.
-func TestLayoutStatusIsHonest(t *testing.T) {
-	if LayoutVerified {
-		t.Fatal("LayoutVerified is true — supply the layout constants, cite the source in LayoutStatus, and update ADR 0003 §4 before flipping this")
-	}
-	if !strings.Contains(LayoutStatus, "UNVERIFIED") {
-		t.Error("LayoutStatus must say UNVERIFIED while LayoutVerified is false")
 	}
 }

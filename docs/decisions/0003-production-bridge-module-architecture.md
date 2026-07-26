@@ -72,8 +72,8 @@ This is the mechanism that lets a wide API be declared honestly.
 | Surface | Depends on | Status today | Ships as |
 |---|---|---|---|
 | `codepage.AtoE` / `EtoA` | U1 | **Retired** (E-L evidence) | Working code, both architectures |
-| `console.EncodeWPL` | U2 — the WPL byte layout | **Open.** No primary citation on either system; research brief 003 outstanding | Complete API, returns `ErrLayoutUnverified` |
-| `console.WTO` | U2 + U3a + U3b | Open | Complete API, returns `ErrLayoutUnverified` before it can reach the platform stub |
+| `console.EncodeWPL` | U2 — the WPL byte layout | **VERIFIED 2026-07-26** for the minimal single-line form, from the IFOX00 macro expansion on MVS 3.8j (evidence `E1-E3-…`). Routed form still uncited (brief 003 Q3) | Working code for the minimal form; `WithRoute`/`WithDescriptor` return `ErrLayoutUnverified` |
+| `console.WTO` | U2 verified; U3 open | Builds a real parameter list, then stops at the platform boundary | Working encoder; returns `ErrUnsupportedPlatform` off z/OS |
 | `internal/storage.Malloc31` | U3a | Open | Declared, returns `ErrUnsupportedPlatform` |
 | `dataset.*`, `subsys.*` | not yet scoped | Open | Interfaces only |
 
