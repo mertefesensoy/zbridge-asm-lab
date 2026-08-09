@@ -1,0 +1,573 @@
+<title>WTO from Go assembly — what we proved, and how to explain it</title>
+
+<style>
+  /* ------------------------------------------------------------------
+     Design direction: continuous-form greenbar printer paper.
+     Everything this project produced came off a 1403 line printer as
+     fixed-form listings, so the page is set as that paper: pale green
+     alternating bands, olive-black ink, IBM blue for structure, oxide
+     red reserved for the one field that matters (the length halfword).
+     Monospace is the primary face because every artefact in this
+     world is column-aligned; a humanist sans carries running prose.
+     ------------------------------------------------------------------ */
+  :root {
+    --paper:      #F2F4EC;
+    --band:       #E2EBDB;
+    --ink:        #1C2117;
+    --ink-soft:   #4A5343;
+    --rule:       #A8B29E;
+    --accent:     #0F4C8C;
+    --oxide:      #8A3324;
+    --oxide-bg:   #F0DED8;
+    --ok:         #2F6B3A;
+    --warn:       #8A6A1F;
+
+    --mono: ui-monospace, "Cascadia Mono", "SF Mono", "Menlo", "Consolas", monospace;
+    --sans: "Seravek", "Gill Sans Nova", "Optima", "Segoe UI", system-ui, sans-serif;
+
+    --measure: 68ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:    #12150F;
+      --band:     #1B2017;
+      --ink:      #DFE5D5;
+      --ink-soft: #9AA48D;
+      --rule:     #3C4436;
+      --accent:   #7FB2E5;
+      --oxide:    #D98E72;
+      --oxide-bg: #33211B;
+      --ok:       #7FBE8A;
+      --warn:     #D6B65C;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #12150F; --band: #1B2017; --ink: #DFE5D5; --ink-soft: #9AA48D;
+    --rule: #3C4436; --accent: #7FB2E5; --oxide: #D98E72; --oxide-bg: #33211B;
+    --ok: #7FBE8A; --warn: #D6B65C;
+  }
+  :root[data-theme="light"] {
+    --paper: #F2F4EC; --band: #E2EBDB; --ink: #1C2117; --ink-soft: #4A5343;
+    --rule: #A8B29E; --accent: #0F4C8C; --oxide: #8A3324; --oxide-bg: #F0DED8;
+    --ok: #2F6B3A; --warn: #8A6A1F;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 78ch; margin: 0 auto; padding: 4rem 1.5rem 6rem; }
+  p, li { max-width: var(--measure); }
+
+  /* ---- masthead: set as a listing header, because that is what it is ---- */
+  .masthead { border-top: 3px solid var(--ink); border-bottom: 1px solid var(--rule);
+              padding: 1rem 0 1.25rem; margin-bottom: 3rem; }
+  .rail { font-family: var(--mono); font-size: .7rem; letter-spacing: .14em;
+          text-transform: uppercase; color: var(--ink-soft);
+          display: flex; flex-wrap: wrap; gap: 1.25rem; }
+  h1 { font-family: var(--mono); font-weight: 700; font-size: clamp(1.7rem, 4.5vw, 2.5rem);
+       line-height: 1.12; letter-spacing: -.02em; margin: 1.1rem 0 .5rem;
+       text-wrap: balance; max-width: 34ch; }
+  .standfirst { font-size: 1.09rem; color: var(--ink-soft); max-width: 60ch; }
+
+  h2 { font-family: var(--mono); font-size: 1.32rem; font-weight: 700; letter-spacing: -.01em;
+       margin: 3.6rem 0 .35rem; text-wrap: balance; }
+  h2 .num { color: var(--accent); }
+  h3 { font-family: var(--mono); font-size: 1.02rem; font-weight: 700;
+       margin: 2.1rem 0 .3rem; }
+  .lede { color: var(--ink-soft); margin-bottom: 1.4rem; }
+
+  section > * + * { margin-top: .85rem; }
+
+  code, .mono { font-family: var(--mono); font-size: .93em; }
+  code { background: var(--band); padding: .08em .32em; border-radius: 2px; }
+
+  /* ---- listing block: real 132-column output, scrolls in its own box ---- */
+  .listing { background: var(--band); border-left: 3px solid var(--accent);
+             font-family: var(--mono); font-size: .8rem; line-height: 1.5;
+             padding: .9rem 1rem; overflow-x: auto; white-space: pre;
+             margin: 1.2rem 0; }
+  .listing b { color: var(--oxide); font-weight: 700; }
+  .listing i { color: var(--accent); font-style: normal; }
+
+  /* ---- byte layout diagram ---- */
+  .bytes { margin: 1.5rem 0; overflow-x: auto; }
+  .byterow { display: flex; gap: 2px; min-width: max-content; }
+  .byte { font-family: var(--mono); font-size: .78rem; text-align: center;
+          border: 1px solid var(--rule); background: var(--paper);
+          padding: .45rem .3rem .3rem; min-width: 3.1rem; cursor: pointer;
+          transition: background .12s, border-color .12s; }
+  .byte:hover, .byte:focus-visible { background: var(--band); border-color: var(--accent); outline: none; }
+  .byte .off { display: block; font-size: .62rem; color: var(--ink-soft); letter-spacing: .06em; }
+  .byte .hex { display: block; font-weight: 700; }
+  .byte .chr { display: block; font-size: .64rem; color: var(--ink-soft); }
+  .byte[data-f="len"]  { background: var(--oxide-bg); border-color: var(--oxide); }
+  .byte[data-f="len"] .hex { color: var(--oxide); }
+  .byte[data-f="flag"] { border-color: var(--accent); }
+  .byte[data-f="desc"], .byte[data-f="rout"] { border-style: dashed; }
+
+  .fieldkey { display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; font-family: var(--mono);
+              font-size: .72rem; text-transform: uppercase; letter-spacing: .08em;
+              color: var(--ink-soft); margin-top: .7rem; }
+  .fieldkey span::before { content: "■ "; }
+  .fieldkey .k-len::before  { color: var(--oxide); }
+  .fieldkey .k-flag::before { color: var(--accent); }
+  .fieldkey .k-text::before { color: var(--rule); }
+
+  .readout { font-family: var(--mono); font-size: .84rem; background: var(--paper);
+             border: 1px solid var(--rule); border-left: 3px solid var(--ink);
+             padding: .75rem .9rem; margin-top: .9rem; min-height: 4.2rem; }
+  .readout .rt { color: var(--accent); font-weight: 700; }
+
+  .toggle { display: inline-flex; gap: 0; margin: 1.2rem 0 .2rem;
+            border: 1px solid var(--rule); }
+  .toggle button { font-family: var(--mono); font-size: .76rem; letter-spacing: .06em;
+                   text-transform: uppercase; background: var(--paper); color: var(--ink-soft);
+                   border: none; padding: .5rem .9rem; cursor: pointer; }
+  .toggle button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+  .toggle button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  /* ---- tables set as greenbar ---- */
+  .tw { overflow-x: auto; margin: 1.3rem 0; }
+  table { border-collapse: collapse; width: 100%; min-width: 34rem;
+          font-size: .89rem; font-variant-numeric: tabular-nums; }
+  th { font-family: var(--mono); font-size: .69rem; text-transform: uppercase;
+       letter-spacing: .1em; text-align: left; color: var(--ink-soft);
+       border-bottom: 2px solid var(--ink); padding: .4rem .6rem; }
+  td { padding: .46rem .6rem; vertical-align: top; border-bottom: 1px solid var(--rule); }
+  tbody tr:nth-child(odd) { background: var(--band); }
+  td .mono { font-size: .86em; }
+  .yes { color: var(--ok); font-weight: 700; }
+  .no  { color: var(--oxide); font-weight: 700; }
+  .part { color: var(--warn); font-weight: 700; }
+
+  /* ---- rung ladder ---- */
+  .ladder { list-style: none; padding: 0; margin: 1.4rem 0; }
+  .ladder li { display: grid; grid-template-columns: 3.6rem 1fr; gap: .9rem;
+               padding: .7rem 0; border-bottom: 1px solid var(--rule); max-width: none; }
+  .ladder .tag { font-family: var(--mono); font-weight: 700; font-size: .82rem;
+                 color: var(--paper); background: var(--ok); text-align: center;
+                 padding: .18rem 0; height: 1.55rem; }
+  .ladder .tag.open { background: var(--rule); color: var(--ink); }
+  .ladder strong { display: block; }
+  .ladder p { margin: .15rem 0 0; font-size: .93rem; color: var(--ink-soft); }
+
+  /* ---- self-test ---- */
+  .quiz { border: 1px solid var(--rule); border-top: 3px solid var(--accent);
+          padding: 1.1rem 1.2rem; margin: 1.3rem 0; background: var(--band); }
+  .quiz h3 { margin-top: 0; }
+  .quiz ol { margin: 0; padding-left: 1.3rem; }
+  .quiz li { margin: .75rem 0; }
+  .quiz .q { font-weight: 600; }
+  .quiz button.rev { font-family: var(--mono); font-size: .7rem; text-transform: uppercase;
+                     letter-spacing: .08em; background: none; border: 1px solid var(--rule);
+                     color: var(--ink-soft); padding: .2rem .55rem; cursor: pointer;
+                     margin-top: .3rem; }
+  .quiz button.rev:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .quiz .a { display: none; margin-top: .45rem; padding-left: .8rem;
+             border-left: 2px solid var(--accent); color: var(--ink-soft); font-size: .95rem; }
+  .quiz .a.shown { display: block; }
+
+  .note { border-left: 3px solid var(--oxide); background: var(--oxide-bg);
+          padding: .8rem 1rem; margin: 1.3rem 0; font-size: .95rem; }
+  .note strong { color: var(--oxide); }
+
+  footer { margin-top: 4.5rem; border-top: 1px solid var(--rule); padding-top: 1.2rem;
+           font-family: var(--mono); font-size: .72rem; color: var(--ink-soft); }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <div class="rail">
+    <span>zbridge-asm-lab</span>
+    <span>MVS 3.8j · TK5 update 5</span>
+    <span>2026-07-26</span>
+    <span>E0–E3 passed</span>
+  </div>
+  <h1>WTO from Go assembly</h1>
+  <p class="standfirst">What the project proved, in the order you would explain it to
+  someone who knows MVS better than you do. Every hex value on this page came off a real
+  system — none of it is illustrative.</p>
+</header>
+
+<section>
+  <h2><span class="num">1 ·</span> The one-sentence version</h2>
+  <p>We are building <code>WTO(message string) error</code> — a Go function that writes to
+  the z/OS operator console — implemented in <strong>pure Go assembly, with no cgo</strong>.
+  <code>ibmruntimes/go-recordio</code> proved a Go program can call an MVS service directly,
+  but it only covers IEFSSREQ. Operator-facing services like WTO have no public
+  Go-assembly implementation. <em>That gap is the thesis.</em></p>
+  <p>Today the parameter list this function has to build was verified byte-for-byte against
+  IBM's own macro, and bytes produced by our Go code were accepted by a real
+  <code>SVC 35</code>.</p>
+</section>
+
+<section>
+  <h2><span class="num">2 ·</span> Three unknowns — the spine of every decision</h2>
+  <p class="lede">If you only remember one framework, remember this one. It is what turns
+  "we don't have a mainframe" from a blocker into a work plan.</p>
+  <div class="tw">
+  <table>
+    <thead><tr><th>Unknown</th><th>The question</th><th>Retired by</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">U1</td>
+          <td>Does our Go assembly emit correct s390x, and does the Go ABI hold on a
+              big-endian 64-bit target?</td>
+          <td>QEMU s390x — no mainframe needed</td>
+          <td class="yes">RETIRED</td></tr>
+      <tr><td class="mono">U2</td>
+          <td>Is the WTO parameter list byte-correct, and does <code>SVC 35</code> accept it?</td>
+          <td>MVS 3.8j under Hercules — the only oracle that exists</td>
+          <td class="yes">RETIRED</td></tr>
+      <tr><td class="mono">U3</td>
+          <td><code>GOOS=zos</code> toolchain, <code>Malloc31</code> below the 2 GB bar,
+              AMODE 31↔64 switching, USS</td>
+          <td><strong>Nothing emulates this.</strong> Real entitled z/OS only</td>
+          <td class="no">OPEN</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>The decomposition is the reason work never stopped. Two of three unknowns fell on a
+  laptop.</p>
+</section>
+
+<section>
+  <h2><span class="num">3 ·</span> The ladder, and what each rung actually proved</h2>
+  <ol class="ladder">
+    <li><span class="tag">E0</span><div>
+      <strong>The laboratory works</strong>
+      <p>TK5 IPLs unattended, the console is readable, a job goes in and output comes back.
+      Driven entirely through the socket card reader on port 3505 — no 3270 terminal, no
+      operator. <code>IEFBR14</code>, <code>COND CODE 0000</code>.</p>
+    </div></li>
+    <li><span class="tag">E1</span><div>
+      <strong>The layout, from IBM's own macro</strong>
+      <p>Assembled <code>WTO 'text',MF=L</code> under IFOX00 with <code>PRINT ON,GEN,DATA</code>
+      and read the expansion. This is the primary source — there is no prose manual that
+      documents it.</p>
+    </div></li>
+    <li><span class="tag">E2</span><div>
+      <strong>We understand it, not just how to call a macro</strong>
+      <p>Parameter list hand-built as <code>DC</code> constants, <code>LA 1,WPL</code>,
+      raw <code>SVC 35</code>. No <code>WTO</code> macro anywhere in the program. Reached the
+      console. <em>This is the rung that retires U2.</em></p>
+    </div></li>
+    <li><span class="tag">E3</span><div>
+      <strong>Go's bytes crossed</strong>
+      <p>Go cannot run on MVS 3.8j — but its bytes can. <code>console.EncodeWPL</code> built
+      the list on a Windows laptop, <code>FormatDC</code> rendered it into
+      <code>DC X'…'</code>, and a real <code>SVC 35</code> accepted it.</p>
+    </div></li>
+    <li><span class="tag open">T3</span><div>
+      <strong>WTO on a z/OS console</strong>
+      <p>Still ahead. Needs entitled z/OS access and IBM's Go fork.</p>
+    </div></li>
+  </ol>
+</section>
+
+<section>
+  <h2><span class="num">4 ·</span> The WTO parameter list, byte by byte</h2>
+  <p class="lede">Click any byte. This is the centre of the whole project — if you can
+  explain this diagram, you can explain the thesis.</p>
+
+  <div class="toggle" role="group" aria-label="Parameter list form">
+    <button id="btn-min" aria-pressed="true">Minimal form</button>
+    <button id="btn-full" aria-pressed="false">With routing codes</button>
+  </div>
+
+  <div class="bytes"><div class="byterow" id="byterow"></div></div>
+  <div class="fieldkey">
+    <span class="k-len">length halfword</span>
+    <span class="k-flag">MCS flags</span>
+    <span class="k-text">EBCDIC text</span>
+  </div>
+  <div class="readout" id="readout" role="status">Hover or click a byte to see what it is.</div>
+
+  <h3>Where this comes from</h3>
+  <div class="listing">  LOC  OBJECT CODE      STMT   SOURCE STATEMENT
+000000                     7 WPLMIN   <i>WTO   'ZBRIDGE TEST HELLO',MF=L</i>
+000000                     8+WPLMIN   DC    0F'0'
+000000 <b>0016</b>                9+         DC    <b>AL2(22)</b>                 TEXT LENGTH
+000002 0000               10+         DC    B'0000000000000000'     MCS FLAGS
+000004 E9C2D9C9C4C7C540   11+         DC    C'ZBRIDGE TEST HELLO'   MESSAGE TEXT
+00000C E3C5E2E340C8C5D3
+000014 D3D6</div>
+
+  <p><strong>The length field is <code>len(text) + 4</code></strong> — and now you can say
+  <em>why</em> instead of just quoting the rule: it counts its own two bytes, plus the two
+  flag bytes, plus the text. It is a length of <em>header plus text</em>, not a length of
+  text. Confirmed at two lengths: 18 characters gave <code>0x0016</code> (22), 38 gave
+  <code>0x002A</code> (42).</p>
+
+  <div class="note">
+    <p><strong>The trap.</strong> Switch to the routed form above and watch the length
+    field. Four more bytes are appended after the text — descriptor codes and routing
+    codes — and <strong>the length field still reads 22</strong>. So "length = the whole
+    parameter list" is wrong. It only ever covers the four header bytes plus the text.
+    An implementation that got this wrong would look correct until someone passed a
+    routing code.</p>
+  </div>
+
+  <p>The routed form also tells us what MCS flag bit 0 (<code>0x8000</code>) means: the
+  descriptor and routing halfwords are present. Our research brief could not find a
+  citable bit table for the other fifteen bits, which is exactly why our library
+  <em>refuses</em> routing options rather than guessing at them.</p>
+</section>
+
+<section>
+  <h2><span class="num">5 ·</span> The dangerous part: two ABIs want the same registers</h2>
+  <p class="lede">This is the detail most likely to break the real implementation, and the
+  one worth raising with your mentor unprompted.</p>
+  <div class="tw">
+  <table>
+    <thead><tr><th>Reg</th><th>Standard MVS linkage</th><th>Go on s390x</th><th>Collision</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">R1</td><td>parameter list address</td><td>general use</td><td>—</td></tr>
+      <tr><td class="mono">R13</td><td>address of a 72-byte save area</td>
+          <td><strong>the goroutine pointer <code>g</code></strong> (<code>REGG</code>)</td>
+          <td class="no">YES</td></tr>
+      <tr><td class="mono">R14</td><td>return address</td><td>link register</td>
+          <td class="yes">agrees</td></tr>
+      <tr><td class="mono">R15</td><td>entry point in, return code out</td>
+          <td><strong>the stack pointer</strong> (<code>REGSP</code>)</td>
+          <td class="no">YES</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Clobber R13 and the Go runtime cannot find the current goroutine. Clobber R15 and
+  there is no stack. A Go assembly routine that establishes MVS linkage has to save both,
+  set the MVS values, call the service, and restore both before returning to Go. These
+  assignments are not folklore — they are in
+  <code>cmd/internal/obj/s390x/a.out.go</code>: <code>REGG = REG_R13</code>,
+  <code>REGSP = REG_R15</code>.</p>
+</section>
+
+<section>
+  <h2><span class="num">6 ·</span> Why s390x is the right machine for this</h2>
+  <p class="lede">The exercises deliberately write naive assembly on amd64, then let the
+  target architecture collapse it. Here is the payoff, with real encodings.</p>
+
+  <h3>EBCDIC translation</h3>
+  <p>On amd64, seven instructions per byte: load, index the table, store, two pointer
+  bumps, decrement, branch. On s390x it becomes two block instructions per 256 bytes:</p>
+  <div class="listing">16ae8e:  <b>d2 ff 20 00 40 00</b>    mvc   0(256,%r2),0(%r4)   <i>copy the block</i>
+16ae94:  <b>dc ff 20 00 30 00</b>    tr    0(256,%r2),0(%r3)   <i>translate it in place</i></div>
+  <p>Two honest corrections worth making yourself before anyone makes them for you.
+  First, <code>TR</code> translates <em>in place</em>, so a two-buffer API costs
+  <code>MVC</code> then <code>TR</code> — the roadmap's "one instruction replaces the loop"
+  is not literally true. Second, <strong>Go's s390x assembler has no <code>TR</code>
+  mnemonic at all</strong> — 729 mnemonics and the translate family is absent — so those
+  six bytes are hand-encoded, then verified by disassembling them with GNU
+  <code>objdump</code>, which does know the instruction.</p>
+
+  <div class="note">
+    <p><strong>Why that matters far beyond <code>ebcdic</code>.</strong> There is no
+    <code>SVC</code> mnemonic either. So <code>SVC 35</code> — the whole endgame — will have
+    to be hand-encoded the same way: <code>BYTE $0x0A; BYTE $0x23</code>. Today's exercise
+    was an unintentional rehearsal of the exact technique the thesis needs. The precedent
+    is inside the Go distribution: <code>x/sys/unix/asm_zos_s390x.s</code> encodes
+    <code>SVC 08</code> exactly like this.</p>
+  </div>
+
+  <h3>The other two collapses</h3>
+  <div class="tw">
+  <table>
+    <thead><tr><th>Exercise</th><th>amd64</th><th>s390x</th><th>What it buys</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">strmanip</td>
+          <td><code>SHRQ</code> + two <code>MOVB</code> to build a big-endian halfword by hand</td>
+          <td><code>MOVH</code> — one instruction</td>
+          <td>The WPL starts with a big-endian halfword. On z/Architecture the natural
+              store already puts the high byte first.</td></tr>
+      <tr><td class="mono">bytecmp</td>
+          <td>per-byte load, compare, branch</td>
+          <td><code>CLC</code> — compares up to 256 bytes and sets the condition code</td>
+          <td>The comparison <em>is</em> the instruction: no index register, no loop counter.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">7 ·</span> The divergence you must not gloss over</h2>
+  <p>MVS 3.8j and z/OS <strong>disagree about return codes</strong>, and it is documented
+  on both sides.</p>
+  <div class="tw">
+  <table>
+    <thead><tr><th></th><th>MVS 3.8j</th><th>z/OS</th></tr></thead>
+    <tbody>
+      <tr><td>Return code for a single-line WTO</td>
+          <td class="no">None issued at all</td><td class="yes">Yes, in R15</td></tr>
+      <tr><td>R1 on return</td>
+          <td>24-bit message identification number</td>
+          <td>message identification number</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Consequence: rung E3 <em>cannot</em> prove the "read R15, map to a Go error" step,
+  because the ancestor system has nothing to read. Our error type therefore carries a
+  <code>HasCode bool</code> alongside the code, so "the service returned nothing" is a
+  representable state rather than indistinguishable from "returned zero". That field was
+  added from reading GC28-0683-2 p.210 directly, before the research return independently
+  confirmed the divergence.</p>
+</section>
+
+<section>
+  <h2><span class="num">8 ·</span> What is still genuinely open</h2>
+  <ul>
+    <li><strong>All of U3.</strong> <code>Malloc31</code>, AMODE switching, and the
+    <code>GOOS=zos</code> toolchain. No emulator reaches any of it.</li>
+    <li><strong>Upstream Go cannot target z/OS.</strong> <code>go tool dist list</code>
+    offers <code>linux/s390x</code> and no <code>zos/s390x</code>. IBM's fork is a hard
+    dependency — and that is a <em>separate</em> question from a z/OS licence.</li>
+    <li><strong>The MCS flag bit table.</strong> One bit is attested; the rest are not.</li>
+    <li><strong>Everything z/OS-side.</strong> The layout is verified on the 1981 ancestor.
+    That is what makes it evidence rather than proof.</li>
+  </ul>
+</section>
+
+<section class="quiz">
+  <h3>Before the meeting — say these out loud</h3>
+  <p class="lede">If you can answer without looking, you can hold the conversation.</p>
+  <ol>
+    <li><span class="q">Why is the length field <code>text + 4</code>?</span>
+      <button class="rev">Reveal</button>
+      <div class="a">Because it counts its own two bytes and the two MCS flag bytes as well
+      as the text. It is a length of header-plus-text. And in the routed form it still
+      excludes the trailing descriptor and routing halfwords.</div></li>
+    <li><span class="q">Why did you assemble a macro instead of citing a manual?</span>
+      <button class="rev">Reveal</button>
+      <div class="a">Because no IBM publication documents the byte layout in prose, and none
+      prints the generated expansion. <code>PRINT GEN</code> is the authoritative
+      instrument, so the assembler listing <em>is</em> the primary source. We found this out
+      after reading GC28-0683-2 page by page and discovering it does not contain the
+      layout at all.</div></li>
+    <li><span class="q">What does rung E3 prove that E1 does not?</span>
+      <button class="rev">Reveal</button>
+      <div class="a">E1 proves IBM's macro works. E2 proves we understand the layout, because
+      we built it by hand and issued a raw <code>SVC 35</code>. E3 proves <em>our Go
+      code's</em> bytes are accepted — without Go ever running on a mainframe.</div></li>
+    <li><span class="q">Which two registers make this dangerous, and why?</span>
+      <button class="rev">Reveal</button>
+      <div class="a">R13 and R15. MVS linkage wants R13 for the save area and R15 for the
+      entry point and return code; Go reserves R13 for the goroutine pointer <code>g</code>
+      and R15 for the stack pointer. Clobber either and the Go runtime breaks.</div></li>
+    <li><span class="q">Why can't rung E3 retire the "read R15" step?</span>
+      <button class="rev">Reveal</button>
+      <div class="a">Because MVS 3.8j issues no return code for a single-line WTO — R1 comes
+      back with the message ID instead. z/OS does return one. It is a documented divergence,
+      not a gap in our testing.</div></li>
+    <li><span class="q">What is the biggest remaining risk?</span>
+      <button class="rev">Reveal</button>
+      <div class="a">The toolchain. Upstream Go has no <code>zos/s390x</code> target, so
+      IBM's Go fork is a hard dependency — and obtaining it is a different question from
+      obtaining a z/OS system to run on.</div></li>
+  </ol>
+</section>
+
+<footer>
+  Evidence: docs/evidence/E0-tk5-boot-2026-07-26.md ·
+  E1-E3-wto-layout-and-svc35-2026-07-26.md ·
+  E-L-s390x-port-qemu-2026-07-25.md<br>
+  Every hex value on this page was produced on MVS 3.8j (TK5 update 5) under
+  Hercules 4.9.1.0-SDL, or by GNU objdump 2.46 on a linux/s390x binary.
+  <strong>None of it is a z/OS result.</strong>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  // "ZBRIDGE TEST HELLO" as IBM-1047, exactly as the macro emitted it.
+  var TEXT = [
+    [0xE9,'Z'],[0xC2,'B'],[0xD9,'R'],[0xC9,'I'],[0xC4,'D'],[0xC7,'G'],[0xC5,'E'],[0x40,'␣'],
+    [0xE3,'T'],[0xC5,'E'],[0xE2,'S'],[0xE3,'T'],[0x40,'␣'],[0xC8,'H'],[0xC5,'E'],[0xD3,'L'],
+    [0xD3,'L'],[0xD6,'O']
+  ];
+
+  var DESC = {
+    len:  'Length halfword, big-endian. Value 0x0016 = 22 = 18 text bytes + 4. It counts ' +
+          'these two bytes and the two flag bytes as well as the text — never the trailing ' +
+          'descriptor and routing halfwords.',
+    flag: 'MCS flags, 2 bytes. Zero for a minimal single-line WTO. Bit 0 (0x8000) means ' +
+          'descriptor and routing halfwords follow the text.',
+    text: 'Message text in EBCDIC IBM-1047. Produced on the Go side by codepage.AtoE, ' +
+          'which on s390x runs through a hand-encoded TR instruction.',
+    desc: 'Descriptor codes, 2 bytes, appended AFTER the text. 0x0200 is descriptor code 7 ' +
+          '— code N sets bit N−1, most significant bit first.',
+    rout: 'Routing codes, 2 bytes. 0x0020 is route code 11, same 1-based MSB-first ' +
+          'convention. Note the length field did not change to cover these.'
+  };
+
+  var row = document.getElementById('byterow');
+  var out = document.getElementById('readout');
+  var bMin = document.getElementById('btn-min');
+  var bFull = document.getElementById('btn-full');
+
+  function cell(off, hex, chr, field) {
+    var d = document.createElement('div');
+    d.className = 'byte';
+    d.setAttribute('data-f', field);
+    d.setAttribute('tabindex', '0');
+    d.innerHTML = '<span class="off">' + off + '</span>' +
+                  '<span class="hex">' + hex + '</span>' +
+                  '<span class="chr">' + (chr || '&nbsp;') + '</span>';
+    function show() {
+      out.innerHTML = '<span class="rt">offset ' + off + ' · ' + hex + '</span><br>' + DESC[field];
+    }
+    d.addEventListener('mouseenter', show);
+    d.addEventListener('focus', show);
+    d.addEventListener('click', show);
+    return d;
+  }
+
+  function h(n) { return n.toString(16).toUpperCase().padStart(2, '0'); }
+
+  function render(routed) {
+    row.textContent = '';
+    var o = 0;
+    row.appendChild(cell(h(o++), '00', '', 'len'));
+    row.appendChild(cell(h(o++), '16', '', 'len'));
+    row.appendChild(cell(h(o++), routed ? '80' : '00', '', 'flag'));
+    row.appendChild(cell(h(o++), '00', '', 'flag'));
+    TEXT.forEach(function (t) {
+      row.appendChild(cell(h(o++), h(t[0]), t[1], 'text'));
+    });
+    if (routed) {
+      row.appendChild(cell(h(o++), '02', '', 'desc'));
+      row.appendChild(cell(h(o++), '00', '', 'desc'));
+      row.appendChild(cell(h(o++), '00', '', 'rout'));
+      row.appendChild(cell(h(o++), '20', '', 'rout'));
+      out.innerHTML = '<span class="rt">Routed form — ' + o + ' bytes total</span><br>' +
+        'The length field still reads 0x0016 = 22, even though this list is ' + o +
+        ' bytes long. That is the trap.';
+    } else {
+      out.innerHTML = '<span class="rt">Minimal form — ' + o + ' bytes total</span><br>' +
+        'Here the length field (22) and the list length (' + o +
+        ') coincide. Switch to the routed form and they stop coinciding.';
+    }
+    bMin.setAttribute('aria-pressed', String(!routed));
+    bFull.setAttribute('aria-pressed', String(routed));
+  }
+
+  bMin.addEventListener('click', function () { render(false); });
+  bFull.addEventListener('click', function () { render(true); });
+  render(false);
+
+  Array.prototype.forEach.call(document.querySelectorAll('.quiz button.rev'), function (b) {
+    b.addEventListener('click', function () {
+      var a = b.nextElementSibling;
+      var open = a.classList.toggle('shown');
+      b.textContent = open ? 'Hide' : 'Reveal';
+    });
+  });
+})();
+</script>

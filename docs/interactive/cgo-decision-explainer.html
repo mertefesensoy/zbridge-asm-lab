@@ -1,0 +1,348 @@
+<title>The cgo fallback — every term, then the decision</title>
+
+<style>
+  /* Same greenbar-listing visual system as wto-explainer.html, deliberately:
+     these are companion documents and consistency is the point. */
+  :root {
+    --paper:#F2F4EC; --band:#E2EBDB; --ink:#1C2117; --ink-soft:#4A5343;
+    --rule:#A8B29E; --accent:#0F4C8C; --oxide:#8A3324; --oxide-bg:#F0DED8;
+    --ok:#2F6B3A; --warn:#8A6A1F;
+    --mono: ui-monospace,"Cascadia Mono","SF Mono","Menlo","Consolas",monospace;
+    --sans: "Seravek","Gill Sans Nova","Optima","Segoe UI",system-ui,sans-serif;
+    --measure: 68ch;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper:#12150F; --band:#1B2017; --ink:#DFE5D5; --ink-soft:#9AA48D;
+            --rule:#3C4436; --accent:#7FB2E5; --oxide:#D98E72; --oxide-bg:#33211B;
+            --ok:#7FBE8A; --warn:#D6B65C; }
+  }
+  :root[data-theme="dark"] { --paper:#12150F; --band:#1B2017; --ink:#DFE5D5; --ink-soft:#9AA48D;
+    --rule:#3C4436; --accent:#7FB2E5; --oxide:#D98E72; --oxide-bg:#33211B; --ok:#7FBE8A; --warn:#D6B65C; }
+  :root[data-theme="light"] { --paper:#F2F4EC; --band:#E2EBDB; --ink:#1C2117; --ink-soft:#4A5343;
+    --rule:#A8B29E; --accent:#0F4C8C; --oxide:#8A3324; --oxide-bg:#F0DED8; --ok:#2F6B3A; --warn:#8A6A1F; }
+
+  body { background:var(--paper); color:var(--ink); font-family:var(--sans);
+         font-size:17px; line-height:1.62; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:78ch; margin:0 auto; padding:3.5rem 1.5rem 6rem; }
+  p, li { max-width:var(--measure); }
+
+  .masthead { border-top:3px solid var(--ink); border-bottom:1px solid var(--rule);
+              padding:1rem 0 1.25rem; margin-bottom:2.6rem; }
+  .rail { font-family:var(--mono); font-size:.7rem; letter-spacing:.14em;
+          text-transform:uppercase; color:var(--ink-soft); display:flex;
+          flex-wrap:wrap; gap:1.25rem; }
+  h1 { font-family:var(--mono); font-weight:700; font-size:clamp(1.6rem,4.4vw,2.35rem);
+       line-height:1.13; letter-spacing:-.02em; margin:1.05rem 0 .5rem;
+       text-wrap:balance; max-width:32ch; }
+  .standfirst { font-size:1.08rem; color:var(--ink-soft); max-width:60ch; }
+
+  h2 { font-family:var(--mono); font-size:1.28rem; font-weight:700; margin:3.3rem 0 .3rem;
+       text-wrap:balance; }
+  h2 .num { color:var(--accent); }
+  h3 { font-family:var(--mono); font-size:1rem; font-weight:700; margin:1.9rem 0 .25rem; }
+  .lede { color:var(--ink-soft); margin-bottom:1.3rem; }
+  section > * + * { margin-top:.8rem; }
+
+  code { font-family:var(--mono); font-size:.92em; background:var(--band);
+         padding:.08em .32em; border-radius:2px; }
+
+  /* glossary */
+  .term { border-left:3px solid var(--accent); padding:.15rem 0 .15rem 1rem;
+          margin:1.15rem 0; max-width:var(--measure); }
+  .term dt { font-family:var(--mono); font-weight:700; font-size:.97rem; }
+  .term dd { margin:.15rem 0 0; }
+  .term .why { display:block; margin-top:.35rem; font-size:.93rem; color:var(--ink-soft); }
+  .term .why b { color:var(--oxide); font-weight:700; }
+
+  /* two-path comparison */
+  .paths { display:grid; grid-template-columns:1fr; gap:1rem; margin:1.5rem 0; }
+  @media (min-width:46rem) { .paths { grid-template-columns:1fr 1fr; } }
+  .path { border:1px solid var(--rule); background:var(--band); padding:1rem 1.1rem; }
+  .path h3 { margin-top:0; }
+  .path.direct { border-top:3px solid var(--accent); }
+  .path.cgo { border-top:3px solid var(--oxide); }
+  .chain { font-family:var(--mono); font-size:.78rem; line-height:1.85; margin:.6rem 0 .8rem; }
+  .chain span { display:block; }
+  .chain .step::before { content:"↓ "; color:var(--ink-soft); }
+  .chain .first::before { content:""; }
+  .chain .dep { color:var(--oxide); }
+  .path ul { margin:.4rem 0 0; padding-left:1.15rem; font-size:.94rem; }
+  .path li { margin:.25rem 0; }
+
+  .tw { overflow-x:auto; margin:1.3rem 0; }
+  table { border-collapse:collapse; width:100%; min-width:32rem; font-size:.9rem; }
+  th { font-family:var(--mono); font-size:.68rem; text-transform:uppercase; letter-spacing:.1em;
+       text-align:left; color:var(--ink-soft); border-bottom:2px solid var(--ink); padding:.4rem .6rem; }
+  td { padding:.46rem .6rem; vertical-align:top; border-bottom:1px solid var(--rule); }
+  tbody tr:nth-child(odd) { background:var(--band); }
+  .yes { color:var(--ok); font-weight:700; }
+  .no { color:var(--oxide); font-weight:700; }
+
+  .punch { border:1px solid var(--oxide); border-left:4px solid var(--oxide);
+           background:var(--oxide-bg); padding:1.1rem 1.2rem; margin:1.8rem 0; }
+  .punch h3 { margin-top:0; color:var(--oxide); }
+
+  .callout { border-left:3px solid var(--accent); background:var(--band);
+             padding:.8rem 1rem; margin:1.2rem 0; font-size:.95rem; }
+
+  footer { margin-top:4rem; border-top:1px solid var(--rule); padding-top:1.1rem;
+           font-family:var(--mono); font-size:.72rem; color:var(--ink-soft); }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <div class="rail">
+    <span>decision support</span>
+    <span>roadmap page 8, question 1</span>
+    <span>2026-07-27</span>
+  </div>
+  <h1>The cgo fallback</h1>
+  <p class="standfirst">Every term you need, then the one question. Read section 5 first
+  if you want the punchline — it changed my own view of this decision.</p>
+</header>
+
+<section>
+  <h2><span class="num">1 ·</span> What is actually being decided</h2>
+  <p>Your roadmap asks Jürgen a hedging question: <em>should the target be downscaled —
+  do WTO the easy way first (through cgo), and treat the direct <code>SVC 35</code>
+  version as a stretch goal?</em></p>
+  <p>That question was written before we had any evidence. We now have quite a lot. The
+  decision is whether to <strong>close it ourselves</strong> and commit to the direct
+  route, or leave it open for him to rule on.</p>
+</section>
+
+<section>
+  <h2><span class="num">2 ·</span> The terms</h2>
+  <p class="lede">Each one includes why it matters to <em>this</em> decision, not just
+  what it means.</p>
+
+  <dl class="term">
+    <dt>cgo</dt>
+    <dd>Go's mechanism for calling C functions from Go code.</dd>
+    <span class="why">Why it matters: <b>using it means a C compiler is required at build
+    time</b>, and the resulting binary is no longer a self-contained pure-Go executable.
+    Go's headline property — one static binary, no runtime dependencies — is what you
+    give up.</span>
+  </dl>
+
+  <dl class="term">
+    <dt>Language Environment (LE)</dt>
+    <dd>IBM's shared runtime on z/OS that C, COBOL and PL/I programs all execute under. It
+    provides storage management, condition handling, and the C library.</dd>
+    <span class="why">Why it matters: <b>on z/OS, "using C" means "running under LE."</b>
+    A cgo build inherits LE as a dependency. Your thesis statement is explicitly "no cgo,
+    no Language Environment dependency" — these are the same commitment stated twice.</span>
+  </dl>
+
+  <dl class="term">
+    <dt><code>__console2()</code></dt>
+    <dd>A function in the z/OS C library that writes a message to the operator console.</dd>
+    <span class="why">Why it matters: it is the "easy path." Underneath, it does what you
+    are doing by hand — builds a parameter list and issues the supervisor call. <b>The
+    difference is not what reaches the console; it is who builds the parameter list.</b>
+    Calling it from Go means Go → cgo → LE → C library → WTO.</span>
+  </dl>
+
+  <dl class="term">
+    <dt>WTO · <code>SVC 35</code></dt>
+    <dd>Write To Operator. On MVS and z/OS, a service is invoked by a <em>supervisor
+    call</em> — the instruction <code>SVC n</code> traps into the operating system, and
+    <code>n</code> selects the service. WTO is service 35.</dd>
+    <span class="why">Why it matters: this is the direct route. You build the parameter
+    list yourself, put its address in register 1, and issue <code>SVC 35</code>. <b>No C
+    anywhere.</b></span>
+  </dl>
+
+  <dl class="term">
+    <dt>Problem state · key 8 · APF authorization</dt>
+    <dd>z/OS separates privileged code (supervisor state, authorized) from ordinary
+    application code (problem state, storage key 8). APF is the mechanism that grants a
+    program authorization.</dd>
+    <span class="why">Why it matters: <b>WTO works from problem state without
+    authorization.</b> That is why it is a viable student-project target — you do not need
+    special privileges on someone else's system. Unauthorized messages get a prefix
+    character on the console (we observed <code>+</code>), which is cosmetic, not a
+    block.</span>
+  </dl>
+
+  <dl class="term">
+    <dt>Parameter list · WPL</dt>
+    <dd>The block of bytes a service reads its arguments from. For WTO it is the WTO
+    Parameter List: a 2-byte length, 2 bytes of MCS flags, then the message text in
+    EBCDIC.</dd>
+    <span class="why">Why it matters: <b>this is the thing we spent two days proving.</b>
+    Getting it byte-correct is the whole difficulty of the direct route, and it is now
+    verified against IBM's own macro and accepted by a real <code>SVC 35</code>.</span>
+  </dl>
+
+  <dl class="term">
+    <dt>EBCDIC · IBM-1047 · <code>AtoE</code></dt>
+    <dd>Mainframes encode text in EBCDIC, not ASCII or UTF-8. IBM-1047 is the code page
+    z/OS UNIX uses. <code>AtoE</code> converts one to the other through a 256-byte table.</dd>
+    <span class="why">Why it matters: the message text inside the parameter list must be
+    EBCDIC. This is done and verified on both architectures.</span>
+  </dl>
+
+  <dl class="term">
+    <dt><code>Malloc31</code> · "below the bar" · AMODE 31 / AMODE 64</dt>
+    <dd>z/OS programs can address memory in 31-bit mode (up to 2 GB — "below the bar") or
+    64-bit mode. Many MVS services are old and only accept 31-bit addresses.
+    <code>Malloc31</code> allocates storage a legacy service can reach; AMODE switching
+    moves between the two modes around the call.</dd>
+    <span class="why">Why it matters: <b>this is the one piece still genuinely
+    unknown.</b> It cannot be tested on any emulator, and it is the one place the project
+    accepts an LE touchpoint — go-recordio exposes a helper for it.</span>
+  </dl>
+
+  <dl class="term">
+    <dt><code>GOOS=zos</code> · IBM's Go fork</dt>
+    <dd>Go's build system targets an operating system and architecture pair. Upstream Go
+    supports <code>linux/s390x</code> but <strong>not</strong> <code>zos/s390x</code> —
+    I verified this against the toolchain source.</dd>
+    <span class="why">Why it matters: <b>you cannot compile a Go program for z/OS with
+    stock Go at all.</b> IBM maintains a fork that can. This is a hard dependency of the
+    endgame, and — importantly for this decision — <b>both routes need it equally.</b></span>
+  </dl>
+
+  <dl class="term">
+    <dt><code>ibmruntimes/go-recordio</code></dt>
+    <dd>An IBM-published Go module that calls the MVS subsystem-request service
+    (IEFSSREQ) directly from Go assembly, with no cgo.</dd>
+    <span class="why">Why it matters: <b>it is the existence proof that the direct route
+    works at all.</b> Your project applies the same pattern to a service nobody has
+    published a Go implementation for.</span>
+  </dl>
+
+  <dl class="term">
+    <dt>Fallback vs. baseline</dt>
+    <dd>A <em>fallback</em> is what you ship if the main plan fails. A <em>baseline</em>
+    is something you keep only to measure against.</dd>
+    <span class="why">Why it matters: this is the actual fork in the question. Option 3
+    keeps cgo as a baseline while dropping it as a fallback.</span>
+  </dl>
+</section>
+
+<section>
+  <h2><span class="num">3 ·</span> The two paths, side by side</h2>
+
+  <div class="paths">
+    <div class="path direct">
+      <h3>Direct — what you are building</h3>
+      <div class="chain">
+        <span class="first">Go program</span>
+        <span class="step">Go assembly builds the WPL</span>
+        <span class="step">load R1 with its address</span>
+        <span class="step"><code>SVC 35</code></span>
+        <span class="step">operator console</span>
+      </div>
+      <ul>
+        <li>No C compiler</li>
+        <li>No Language Environment</li>
+        <li>Static Go binary preserved</li>
+        <li>Needs: <span class="dep">IBM's Go fork</span></li>
+        <li>Hard part: getting the parameter list byte-correct — <strong>done</strong></li>
+      </ul>
+    </div>
+
+    <div class="path cgo">
+      <h3>cgo — the proposed fallback</h3>
+      <div class="chain">
+        <span class="first">Go program</span>
+        <span class="step">cgo boundary</span>
+        <span class="step">C code under LE</span>
+        <span class="step"><code>__console2()</code></span>
+        <span class="step">…builds a WPL and issues <code>SVC 35</code></span>
+        <span class="step">operator console</span>
+      </div>
+      <ul>
+        <li>Needs a C compiler on z/OS</li>
+        <li>Drags in Language Environment</li>
+        <li>Static binary lost</li>
+        <li>Needs: <span class="dep">IBM's Go fork</span> <em>as well</em></li>
+        <li>Hard part: none — IBM already wrote it</li>
+      </ul>
+    </div>
+  </div>
+
+  <p>Both paths end at the same instruction. The difference is whether <em>you</em> build
+  the parameter list or IBM's C library does — and the whole thesis is that doing it
+  yourself, from Go, with no C, has never been published for this service.</p>
+</section>
+
+<section>
+  <h2><span class="num">4 ·</span> What the evidence changed</h2>
+  <div class="tw">
+  <table>
+    <thead><tr><th>Risk in the original question</th><th>Status now</th></tr></thead>
+    <tbody>
+      <tr><td>"We may not be able to work out the parameter-list layout"</td>
+          <td class="yes">Resolved — read from IBM's macro expansion</td></tr>
+      <tr><td>"Our Go code may build it wrong"</td>
+          <td class="yes">Resolved — our bytes accepted by a real <code>SVC 35</code></td></tr>
+      <tr><td>"<code>SVC 35</code> may not be callable the way we think"</td>
+          <td class="yes">Resolved — issued raw, twice, no macro</td></tr>
+      <tr><td>"Go assembly may not be correct on s390x"</td>
+          <td class="yes">Resolved — 29 tests pass on real big-endian s390x</td></tr>
+      <tr><td>Below-the-bar storage and AMODE switching</td>
+          <td class="no">Still open — needs z/OS</td></tr>
+      <tr><td>Getting a z/OS system, and IBM's Go fork</td>
+          <td class="no">Still open — access questions</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Everything the cgo hedge was designed to protect against has been answered. What
+  remains open is <em>access</em>, not <em>feasibility</em>.</p>
+</section>
+
+<section>
+  <h2><span class="num">5 ·</span> The thing that decides it</h2>
+
+  <div class="punch">
+    <h3>The fallback needs strictly more than the plan it insures</h3>
+    <p>A fallback is only insurance if it survives the failure it is meant to cover. Line
+    up the requirements:</p>
+    <div class="tw">
+    <table>
+      <thead><tr><th>Requirement</th><th>Direct route</th><th>cgo route</th></tr></thead>
+      <tbody>
+        <tr><td>IBM's Go fork for z/OS</td><td class="no">required</td><td class="no">required</td></tr>
+        <tr><td>Access to a z/OS system</td><td class="no">required</td><td class="no">required</td></tr>
+        <tr><td>A C compiler on z/OS</td><td class="yes">not needed</td><td class="no">required</td></tr>
+        <tr><td>Language Environment</td><td class="yes">only the Malloc31 touchpoint</td><td class="no">full dependency</td></tr>
+        <tr><td>Parameter-list knowledge</td><td class="no">required — <strong>and obtained</strong></td><td class="yes">not needed</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p><strong>The cgo route is a superset of the direct route's dependencies.</strong> If
+    the two remaining risks materialise — no z/OS access, or no Go fork — the cgo version
+    cannot be built or run either. It insures against nothing that can actually happen,
+    while costing the thesis its central claim.</p>
+    <p>The one thing it <em>did</em> insure against — "we cannot work out the parameter
+    list" — is exactly the risk that has now been retired.</p>
+  </div>
+
+  <div class="callout">
+    <p>This is also a good thing to say out loud to Jürgen, because it shows you
+    understood your own hedge well enough to see when it stopped being one. That reads
+    better than either keeping it out of caution or dropping it out of confidence.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">6 ·</span> So the question is</h2>
+  <p>Given that the cgo path cannot survive the failures it was meant to insure against,
+  and that Phase 3c already plans a latency comparison against <code>__console2()</code>
+  anyway — do you want to <strong>close</strong> roadmap question 1, and if so, does cgo
+  disappear entirely or survive as a measurement baseline?</p>
+</section>
+
+<footer>
+  Companion to docs/interactive/wto-explainer.html · Evidence:
+  docs/evidence/E1-E3-wto-layout-and-svc35-2026-07-26.md ·
+  E-L-s390x-port-qemu-2026-07-25.md<br>
+  All emulated results; nothing here has run on z/OS.
+</footer>
+
+</div>
