@@ -326,7 +326,9 @@ Read in this order — each builds on the last:
    claims each one can and cannot support.
 5. **[`c4/`](c4/README.md)** — the same system, redrawn as C4 model diagrams at four
    levels of zoom, for readers who think better in pictures than in prose.
+6. **[`testing.md`](testing.md)** — how the seven different kinds of "test" in this
+   repository work, from ordinary unit tests through to evidence rungs that aren't
+   `go test` at all.
 
-For how the test suite proves all of this mechanically, see the (forthcoming) testing
-documentation. For "how do I actually run any of this myself," see the repository's
+For "how do I actually run any of this myself," see the repository's
 `RUN.md`.
