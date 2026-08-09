@@ -1,0 +1,49 @@
+<svg width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" role="img">
+<title>C4 level 2: containers inside zbridge-asm-lab</title>
+<desc>Inside the zbridge-asm-lab repository are four containers: the zbridge library, the gen-e3 CLI which imports it, the lab exercises, and the emulation harness scripts. The emulation harness drives Hercules running MVS 3.8j, and the lab exercises are cross-compiled for QEMU. z/OS sits outside, not yet wired into either.</desc>
+<defs>
+<marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#73726c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+
+<!-- outer boundary -->
+<rect x="40" y="50" width="580" height="240" rx="20" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="60" y="78" font-size="14" font-weight="500" fill="#2C2C2A">zbridge-asm-lab repository</text>
+
+<!-- row 1 -->
+<rect x="70" y="100" width="250" height="64" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<text x="195" y="122" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#26215C">zbridge library</text>
+<text x="195" y="142" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#3C3489">7 Go packages</text>
+
+<rect x="350" y="100" width="230" height="64" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<text x="465" y="122" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#26215C">gen-e3 CLI</text>
+<text x="465" y="142" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#3C3489">Generates test JCL</text>
+<line x1="350" y1="132" x2="322" y2="132" stroke="#534AB7" stroke-width="0.5" marker-end="url(#arrow2)"/>
+
+<!-- row 2 -->
+<rect x="70" y="190" width="250" height="64" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="195" y="212" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#04342C">Lab exercises</text>
+<text x="195" y="232" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#085041">6 teaching modules</text>
+
+<rect x="350" y="190" width="230" height="64" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="465" y="212" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#04342C">Emulation harness</text>
+<text x="465" y="232" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#085041">mvsjob.sh scripts</text>
+
+<!-- external systems -->
+<rect x="70" y="340" width="220" height="64" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="180" y="362" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#2C2C2A">Hercules / MVS 3.8j</text>
+<text x="180" y="382" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#444441">external, emulated</text>
+
+<rect x="330" y="340" width="140" height="64" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="400" y="362" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#2C2C2A">QEMU</text>
+<text x="400" y="382" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#444441">s390x user-mode</text>
+
+<rect x="510" y="340" width="120" height="64" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="570" y="362" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#2C2C2A">z/OS</text>
+<text x="570" y="382" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#444441">not wired in</text>
+
+<!-- cross-boundary arrows -->
+<path d="M465 254 L465 320 L180 320 L180 338" fill="none" stroke="#73726c" stroke-width="0.5" marker-end="url(#arrow2)"/>
+<text x="330" y="314" text-anchor="middle" font-size="12" fill="#73726c">drives</text>
+<path d="M195 254 L195 300 L400 300 L400 338" fill="none" stroke="#73726c" stroke-width="0.5" marker-end="url(#arrow2)"/>
+<text x="300" y="294" text-anchor="middle" font-size="12" fill="#73726c">cross-compiled for</text>
+</svg>

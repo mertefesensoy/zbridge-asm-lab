@@ -1,0 +1,54 @@
+<svg width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" role="img">
+<title>C4 level 1: system context for zbridge</title>
+<desc>A Go developer calls WTO from Go, which is provided by the zbridge system. zbridge depends on emulated test oracles (QEMU and Hercules) during development, requires an IBM Go toolchain fork that does not exist yet to ever build for z/OS, and targets z/OS in production, which is not yet reachable. z/OS displays the resulting message to a mainframe operator.</desc>
+<defs>
+<marker id="arrow1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#73726c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+
+<!-- arrows -->
+<line x1="340" y1="84" x2="340" y2="158" stroke="#73726c" stroke-width="0.5" marker-end="url(#arrow1)"/>
+<path d="M340 224 L340 260 L130 260 L130 298" fill="none" stroke="#73726c" stroke-width="0.5" marker-end="url(#arrow1)"/>
+<line x1="340" y1="224" x2="340" y2="298" stroke="#73726c" stroke-width="0.5" marker-end="url(#arrow1)"/>
+<path d="M340 224 L340 280 L550 280 L550 298" fill="none" stroke="#73726c" stroke-width="0.5" marker-end="url(#arrow1)"/>
+<path d="M130 364 L130 400 L340 400 L340 428" fill="none" stroke="#73726c" stroke-width="0.5" marker-end="url(#arrow1)"/>
+
+<text x="180" y="248" text-anchor="middle" font-size="12" fill="#73726c">once buildable</text>
+<text x="470" y="268" text-anchor="middle" font-size="12" fill="#73726c">requires</text>
+<text x="200" y="392" text-anchor="middle" font-size="12" fill="#73726c">displays message on</text>
+
+<!-- tier 1: person -->
+<g>
+<rect x="250" y="40" width="180" height="44" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="340" y="62" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#2C2C2A">Go developer</text>
+</g>
+
+<!-- tier 2: the system -->
+<g>
+<rect x="210" y="160" width="260" height="64" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<text x="340" y="182" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#26215C">zbridge</text>
+<text x="340" y="202" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#3C3489">Pure Go WTO library</text>
+</g>
+
+<!-- tier 3: external systems -->
+<g>
+<rect x="50" y="300" width="160" height="64" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="130" y="322" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#2C2C2A">z/OS</text>
+<text x="130" y="342" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#444441">Not yet reachable</text>
+</g>
+<g>
+<rect x="250" y="300" width="180" height="64" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="340" y="322" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#04342C">Emulated oracles</text>
+<text x="340" y="342" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#085041">QEMU + Hercules</text>
+</g>
+<g>
+<rect x="470" y="300" width="160" height="64" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="550" y="322" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#2C2C2A">IBM Go fork</text>
+<text x="550" y="342" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#444441">Not yet available</text>
+</g>
+
+<!-- tier 4: person -->
+<g>
+<rect x="250" y="428" width="180" height="44" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="340" y="450" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#2C2C2A">Mainframe operator</text>
+</g>
+</svg>

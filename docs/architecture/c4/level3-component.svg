@@ -1,0 +1,61 @@
+<svg width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" role="img">
+<title>C4 level 3: components inside the zbridge library</title>
+<desc>The zbridge library contains a core error-and-facade package, the working console and codepage packages, three internal packages blocked on z/OS access, and two service families declared but not yet designed. Console depends on codepage for EBCDIC translation and on internal svc for the raw SVC 35 call. All packages depend on the core for the shared error type.</desc>
+<defs>
+<marker id="arrow3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#73726c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+
+<rect x="40" y="50" width="600" height="410" rx="20" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="60" y="78" font-size="14" font-weight="500" fill="#2C2C2A">zbridge library</text>
+
+<!-- row 1: core -->
+<rect x="230" y="100" width="220" height="64" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<text x="340" y="122" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#26215C">zbridge (core)</text>
+<text x="340" y="142" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#3C3489">Errors, platform facade</text>
+
+<!-- row 2: working packages -->
+<rect x="150" y="190" width="180" height="64" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="240" y="212" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#04342C">console</text>
+<text x="240" y="232" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#085041">WTO, WPL encoder</text>
+
+<rect x="350" y="190" width="180" height="64" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="440" y="212" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#04342C">codepage</text>
+<text x="440" y="232" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#085041">EBCDIC translation</text>
+<line x1="330" y1="222" x2="348" y2="222" stroke="#0F6E56" stroke-width="0.5" marker-end="url(#arrow3)"/>
+
+<!-- row 3: blocked on U3 -->
+<rect x="75" y="280" width="140" height="64" rx="10" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+<text x="145" y="300" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#4A1B0C">internal/svc</text>
+<text x="145" y="320" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#712B13">Raw SVC 35 call</text>
+
+<rect x="235" y="280" width="180" height="64" rx="10" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+<text x="325" y="300" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#4A1B0C">internal/storage</text>
+<text x="325" y="320" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#712B13">Malloc31, below the bar</text>
+
+<rect x="435" y="280" width="170" height="64" rx="10" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+<text x="520" y="300" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#4A1B0C">internal/linkage</text>
+<text x="520" y="320" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#712B13">Register conventions</text>
+
+<!-- row 4: not yet scoped -->
+<rect x="155" y="370" width="160" height="64" rx="10" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="235" y="390" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#2C2C2A">subsys</text>
+<text x="235" y="410" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#444441">IEFSSREQ requests</text>
+
+<rect x="335" y="370" width="190" height="64" rx="10" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="430" y="390" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#2C2C2A">dataset</text>
+<text x="430" y="410" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#444441">Record I/O interfaces</text>
+
+<!-- representative arrows -->
+<path d="M340 164 L340 175 L240 175 L240 188" fill="none" stroke="#73726c" stroke-width="0.5" marker-end="url(#arrow3)"/>
+<path d="M240 254 L240 270 L145 270 L145 278" fill="none" stroke="#73726c" stroke-width="0.5" marker-end="url(#arrow3)"/>
+
+<!-- legend -->
+<rect x="60" y="470" width="12" height="12" rx="3" fill="#5DCAA5"/>
+<text x="78" y="480" font-size="12" fill="#444441">working</text>
+<rect x="150" y="470" width="12" height="12" rx="3" fill="#F0997B"/>
+<text x="168" y="480" font-size="12" fill="#444441">blocked on U3</text>
+<rect x="290" y="470" width="12" height="12" rx="3" fill="#D3D1C7"/>
+<text x="308" y="480" font-size="12" fill="#444441">not yet scoped</text>
+<rect x="430" y="470" width="12" height="12" rx="3" fill="#AFA9EC"/>
+<text x="448" y="480" font-size="12" fill="#444441">shared core</text>
+</svg>
