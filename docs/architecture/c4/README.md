@@ -16,6 +16,17 @@ already seen the level above it:
 | 3. Component | What are the pieces *inside one of those* pieces? | One step further |
 | 4. Code | How does one component actually work, call by call? | Closest — this is where actual functions appear |
 
+**These four levels answer "what are the pieces and how are they organized."** They
+deliberately don't answer "what happens in what order," "what state can the system be
+in," or "what do real values actually look like for one real run" — those are
+different questions, with different diagram types, covered in
+**[`sequence-state-object-diagrams.md`](sequence-state-object-diagrams.md)**: a
+sequence diagram of the live demo across all five systems it touches, a state diagram
+of every condition the emulated mainframe can be in (including the one that loses
+work if you skip it), and an object diagram with the actual byte values from one real,
+captured run. If you're preparing to present this project, read that document too —
+it's written at the same zero-assumed-mainframe-knowledge level as this one.
+
 The name comes from "**C**ontext, **C**ontainer, **C**omponent, **C**ode" — four C's.
 Each level is a legitimate stopping point. A reader who only wants the big picture
 stops at Level 1; a reader about to modify `console/wpl.go` needs Level 4.

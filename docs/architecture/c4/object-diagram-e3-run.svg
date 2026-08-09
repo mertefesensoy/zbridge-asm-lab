@@ -1,0 +1,43 @@
+<svg width="100%" viewBox="0 0 680 720" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" role="img">
+<title>Object diagram: the actual objects from one real rung E3 run</title>
+<desc>Three concrete object instances from a real run: job1, an MVSJob named ZBE3GO whose three steps all returned code 0000; wpl1, a WTOParameterList with length field 0x0025, MCS flags 0x0000, and the EBCDIC text ZBRIDGE TEST E3 BYTES BUILT BY GO, which job1 embeds as hex constants; and msg1, a ConsoleMessage with a plus-sign prefix marking it unauthorized, produced when wpl1's bytes were executed.</desc>
+<defs>
+<marker id="arrowObj" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#73726c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+
+<!-- job1 : MVSJob -->
+<rect x="190" y="40" width="300" height="170" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<text x="340" y="66" text-anchor="middle" font-size="14" font-weight="500" fill="#042C53">job1 : MVSJob</text>
+<line x1="210" y1="78" x2="470" y2="78" stroke="#185FA5" stroke-width="0.5"/>
+<text x="210" y="100" font-size="12" fill="#0C447C">JobName = "ZBE3GO"</text>
+<text x="210" y="120" font-size="12" fill="#0C447C">Step 1 ASM: RC = 0000</text>
+<text x="210" y="140" font-size="12" fill="#0C447C">Step 2 LKED: RC = 0000</text>
+<text x="210" y="160" font-size="12" fill="#0C447C">Step 3 GO: RC = 0000</text>
+<text x="210" y="180" font-size="12" fill="#0C447C">SubmittedVia = port 3505</text>
+
+<line x1="340" y1="210" x2="340" y2="258" stroke="#73726c" stroke-width="0.5" marker-end="url(#arrowObj)"/>
+<text x="360" y="238" font-size="12" fill="#73726c">embeds, as hex constants</text>
+
+<!-- wpl1 : WTOParameterList -->
+<rect x="140" y="260" width="400" height="190" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="340" y="286" text-anchor="middle" font-size="14" font-weight="500" fill="#04342C">wpl1 : WTOParameterList</text>
+<line x1="160" y1="298" x2="520" y2="298" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="160" y="320" font-size="12" fill="#085041">LengthField = 0x0025 (37)</text>
+<text x="160" y="340" font-size="12" fill="#085041">MCSFlags = 0x0000</text>
+<text x="160" y="360" font-size="12" fill="#085041">MessageText = "ZBRIDGE TEST E3 BYTES BUILT BY GO"</text>
+<text x="160" y="380" font-size="12" fill="#085041">TextLength = 33 characters</text>
+<text x="160" y="400" font-size="12" fill="#085041">TotalBytes = 37 (4 header + 33 text)</text>
+<text x="160" y="420" font-size="12" fill="#085041">Encoding = EBCDIC IBM-1047</text>
+
+<line x1="340" y1="450" x2="340" y2="518" stroke="#73726c" stroke-width="0.5" marker-end="url(#arrowObj)"/>
+<text x="360" y="488" font-size="12" fill="#73726c">its text becomes</text>
+
+<!-- msg1 : ConsoleMessage -->
+<rect x="140" y="520" width="400" height="150" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<text x="340" y="546" text-anchor="middle" font-size="14" font-weight="500" fill="#26215C">msg1 : ConsoleMessage</text>
+<line x1="160" y1="558" x2="520" y2="558" stroke="#534AB7" stroke-width="0.5"/>
+<text x="160" y="580" font-size="12" fill="#3C3489">Prefix = "+" (unauthorized)</text>
+<text x="160" y="600" font-size="12" fill="#3C3489">Text = "ZBRIDGE TEST E3 BYTES BUILT BY GO"</text>
+<text x="160" y="620" font-size="12" fill="#3C3489">Timestamp = 15.51.08</text>
+<text x="160" y="640" font-size="12" fill="#3C3489">Authorized = false</text>
+</svg>

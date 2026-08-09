@@ -1,5 +1,9 @@
 # zbridge-asm-lab
 
+> **New here, or presenting this project to someone? Read [`START_HERE.md`](START_HERE.md) first.**
+> It assumes zero mainframe background, defines every term, and maps out every other
+> document in the order to read it. To run the demo directly, see [`RUN.md`](RUN.md).
+
 Lab notebook for the Go assembly to z/OS services bridge project.
 Each subdirectory is one self-contained exercise on the path toward
 calling MVS macros from Go assembly without C, following the pattern
