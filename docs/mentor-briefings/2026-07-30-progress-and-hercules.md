@@ -1,11 +1,19 @@
 # Email draft · 2026-07-30 · Progress, and what Hercules could and could not do
 
-> **STATUS: DRAFT. NOT SENT.** Sending is the owner's call
-> (`docs/goal-prompt.md` §5, boundary 3). Review, edit, then send from your own account.
+> **STATUS: SENT.** A shortened, edited version of this draft went out the week of
+> 2026-08-02, and Jürgen replied. The text below is the draft as it was prepared and
+> reviewed pre-send — it is **not** a transcript of what actually went out (the sent
+> version was shorter: two questions rather than four, and no mention of Lucas or the
+> go-recordio walkthrough review). Neither the exact sent text nor Jürgen's reply is
+> filed in this repo yet; whether and how to file that correspondence is a separate,
+> owner-scoped decision, tracked in [issue #1](https://github.com/mertefesensoy/zbridge-asm-lab/issues/1)
+> (Phase 0).
 >
-> **Context this draft assumes:** the 2026-07-27 meeting did not happen, so neither
-> `2026-07-27-phase-checkpoint.md` nor `2026-07-27-zos-access-and-toolchain.md` was
-> delivered. Every question in them is still open.
+> **Context this draft assumed at the time:** the 2026-07-27 meeting did not happen, so
+> neither `2026-07-27-phase-checkpoint.md` nor `2026-07-27-zos-access-and-toolchain.md`
+> had been delivered. Every question in them was still open as of this draft.
+>
+> *(Original pre-send review notes, preserved for the record:)*
 >
 > **This is the short version, by owner request (2026-07-30).** The long-form detail was
 > not deleted — it lives in the two 2026-07-27 briefings and in `docs/evidence/`, which
