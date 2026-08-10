@@ -93,7 +93,7 @@ cmd_up() {
 }
 
 cmd_run() {
-  local jcl=$1 job mark size prev i
+  local jcl=$1 job mark size prev i logmark
   [ -f "$jcl" ] || { echo "no such file: $jcl" >&2; return 1; }
 
   job=$(grep -m1 -oE '^//[A-Z0-9#@$]+' "$jcl" | tr -d '/')
@@ -101,6 +101,13 @@ cmd_run() {
 
   cd "$T" || return 1
   mark=$(wc -c < prt/prt00e.txt 2>/dev/null || echo 0)
+  # gen-e3's generated JCL always names the job ZBE3GO - the same name every
+  # run - so completion detection and the console-message summary below must
+  # only ever look at log lines written AFTER this submission. Without this,
+  # a repeat run can match an EARLIER run's own "$HASP395 ZBE3GO ENDED" within
+  # its first few seconds of polling and report false success while the new
+  # job hasn't actually been processed yet. Found live on 2026-08-10.
+  logmark=$(wc -l < "$LOG" 2>/dev/null || echo 0)
 
   # Device 000C is "3505 3505 sockdev": JCL pushed at TCP 3505 enters the JES2
   # queue as if fed on punched cards. bash's /dev/tcp avoids needing netcat.
@@ -109,11 +116,11 @@ cmd_run() {
 
   for i in $(seq 1 60); do
     sleep 5
-    if grep -qa "\$HASP395 $job" "$LOG" 2>/dev/null; then
+    if tail -n "+$((logmark+1))" "$LOG" 2>/dev/null | grep -qa "\$HASP395 $job"; then
       echo "$job ended after ~$((i*5))s"
       break
     fi
-    if grep -qa "\$HASP396 $job" "$LOG" 2>/dev/null; then
+    if tail -n "+$((logmark+1))" "$LOG" 2>/dev/null | grep -qa "\$HASP396 $job"; then
       echo "!!! $job TERMINATED (JCL error?) after ~$((i*5))s"
       break
     fi
@@ -132,8 +139,10 @@ cmd_run() {
   # "JOB +[0-9]+ +[+@*]" catches the WTO message line itself (e.g.
   # "JOB    1  +ZBRIDGE TEST ..."), which none of the other patterns do -
   # a WTO message doesn't contain the job name, an IEF/ASMA/IEW0 code, or
-  # anything else this filter was otherwise looking for.
-  grep -aE "$job|IEF142I|IEF452I|IEF642I|ASMA|IEW0|JOB +[0-9]+ +[+@*]" "$LOG" | tail -15
+  # anything else this filter was otherwise looking for. Scoped to lines
+  # after $logmark for the same reason as the completion check above - this
+  # run's own messages only, never a previous run's.
+  tail -n "+$((logmark+1))" "$LOG" 2>/dev/null | grep -aE "$job|IEF142I|IEF452I|IEF642I|ASMA|IEW0|JOB +[0-9]+ +[+@*]" | tail -15
 
   size=$(wc -c < prt/prt00e.txt 2>/dev/null || echo 0)
   if [ "$size" -gt "$mark" ]; then

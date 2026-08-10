@@ -271,14 +271,29 @@ This is rung **E3**, the project's central result (see
 [`evidence-ladder.md`](docs/architecture/evidence-ladder.md) §5). Everything before this
 section was preparation; this section is the payoff.
 
+**This section switches between two different shells, twice. Getting this wrong is
+the single most common mistake here** — it produces `go: command not found` (if you
+run §6.2 inside WSL2, where Go is deliberately not installed) or `mvsjob.sh: command
+not found` (if you run §6.1/6.3/6.4 in PowerShell, where there is no bash). Check this
+table before typing anything:
+
+| Step | Shell | You'll know you're in the right one because... |
+|---|---|---|
+| 6.1 Bring MVS up | **WSL2** | prompt looks like `yourname@yourpc:~$` |
+| 6.2 Generate the job | **PowerShell** | prompt looks like `PS C:\...>` |
+| 6.3 Submit it | **WSL2** | prompt looks like `yourname@yourpc:~$` |
+| 6.4 Shut down | **WSL2** | prompt looks like `yourname@yourpc:~$` |
+
+Keep both a PowerShell window/tab and a WSL2 window/tab open side by side — don't try
+to do this in one terminal by typing `wsl` and `exit` repeatedly.
+
 ### 6.1 Bring MVS up
 
-From here on, everything runs from **inside a WSL2 terminal** — type `wsl` in
-PowerShell/Windows Terminal, or launch "Ubuntu" from the Start menu; you'll know
-you're there when the prompt looks like `yourname@yourpc:~$` rather than `PS C:\...>`.
-`mvsjob.sh` (copied into WSL2 once, per §4.4) reads the TK5 install location from the
-`TK5_HOME` environment variable, defaulting to `$HOME/mvs-tk5` — which matches §4.3, so
-in the normal case you don't need to set it at all:
+**Run this in WSL2** (type `wsl` in PowerShell/Windows Terminal, or launch "Ubuntu"
+from the Start menu). `mvsjob.sh` (copied into WSL2 once, per §4.4) reads the TK5
+install location from the `TK5_HOME` environment variable, defaulting to
+`$HOME/mvs-tk5` — which matches §4.3, so in the normal case you don't need to set it
+at all:
 
 ```bash
 ~/mvsjob.sh up
