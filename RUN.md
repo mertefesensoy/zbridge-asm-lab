@@ -44,11 +44,21 @@ in this list.** That absence is not an omission — it's the entire point of the
 (see [`docs/architecture/README.md`](docs/architecture/README.md) §4).
 
 **Verify the TK5 download before trusting it.** Anyone can put a file at a URL; the hash
-is what makes this reproducible rather than an act of faith:
+is what makes this reproducible rather than an act of faith. §4.3 downloads it *inside*
+WSL2, so `sha256sum` (below) is the one you'll actually use — the PowerShell form is
+here too only because it's easy to reach for `sha256sum` out of habit in a Windows
+terminal and get "not recognized as a cmdlet" instead:
 
 ```bash
+# inside WSL2 — this is the one §4.3 actually uses
 sha256sum mvs-tk5.zip
 # must print: 710d002843631322810a276dd42c793fda458548dc64d86e2914a62db7425f84
+```
+
+```powershell
+# if you instead downloaded it on the Windows side — sha256sum doesn't exist in PowerShell
+(Get-FileHash mvs-tk5.zip -Algorithm SHA256).Hash
+# must print (case-insensitive): 710D002843631322810A276DD42C793FDA458548DC64D86E2914A62DB7425F84
 ```
 
 ---
