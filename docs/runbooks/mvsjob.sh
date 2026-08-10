@@ -22,10 +22,15 @@
 #     invocation must do up -> run -> down. MVS cannot survive between calls.
 set -u
 
-T=${TK5_HOME:-/root/mvs-tk5}
-FIFO=${TK5_FIFO:-/root/tk5.fifo}
+# $HOME, not a hardcoded /root: this script is meant to run as whichever
+# user owns the TK5 install, not specifically as root. Running it as a
+# non-root user against a /root-owned install fails with a plain
+# "Permission denied" and no other clue - found the hard way on 2026-08-10.
+# Set TK5_HOME explicitly if your install lives somewhere else.
+T=${TK5_HOME:-$HOME/mvs-tk5}
+FIFO=${TK5_FIFO:-$HOME/tk5.fifo}
 LOG=$T/log/3033.log
-OUT=${TK5_OUT:-/root/mvsjob-out}
+OUT=${TK5_OUT:-$HOME/mvsjob-out}
 
 herc_count() {
   pgrep -f 'hercules -f conf/tk5.cnf' 2>/dev/null | wc -l
@@ -50,7 +55,14 @@ cmd_up() {
   rm -f "$FIFO"
   mkfifo "$FIFO"
 
-  export PATH="$T/hercules/linux/64/bin:$PATH"
+  # Deliberately NOT ":$PATH" here. WSL2 imports the entire Windows PATH by
+  # default (Program Files, dozens of entries, most containing spaces), and
+  # something in Hercules'/TK5's own startup chain breaks on an unquoted
+  # space once that inherited PATH is prepended-to and re-exported — fails
+  # with "bash: line 1: C:/Program: No such file or directory" or similar
+  # mangled fragments. A clean, space-free base plus the hercules bin dir is
+  # all this script or Hercules itself ever needs.
+  export PATH="$T/hercules/linux/64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   export LD_LIBRARY_PATH="$T/hercules/linux/64/lib:$T/hercules/linux/64/lib/hercules:${LD_LIBRARY_PATH:-}"
   export HERCULES_RC=scripts/ipl.rc
 
@@ -117,7 +129,11 @@ cmd_run() {
   done
 
   echo "--------------- console messages for $job ---------------"
-  grep -aE "$job|IEF142I|IEF452I|IEF642I|ASMA|IEW0" "$LOG" | tail -15
+  # "JOB +[0-9]+ +[+@*]" catches the WTO message line itself (e.g.
+  # "JOB    1  +ZBRIDGE TEST ..."), which none of the other patterns do -
+  # a WTO message doesn't contain the job name, an IEF/ASMA/IEW0 code, or
+  # anything else this filter was otherwise looking for.
+  grep -aE "$job|IEF142I|IEF452I|IEF642I|ASMA|IEW0|JOB +[0-9]+ +[+@*]" "$LOG" | tail -15
 
   size=$(wc -c < prt/prt00e.txt 2>/dev/null || echo 0)
   if [ "$size" -gt "$mark" ]; then
@@ -147,7 +163,13 @@ cmd_down() {
   fi
   cd "$T" || return 1
 
-  echo "script scripts/shutdown" > "$FIFO"
+  # scripts/shutdown was tried first and, on 2026-08-10, twice ran its own
+  # sequence to completion ("Script N: file scripts/shutdown processing
+  # ended") without ever actually halting Hercules - the system stayed up
+  # and kept doing routine work for 8+ minutes afterward. scripts/poweroff
+  # completed cleanly both times it was tried, in under 90 seconds, so it is
+  # now the default. Documented in docs/evidence/ - see the runbook.
+  echo "script scripts/poweroff" > "$FIFO"
   for i in $(seq 1 72); do
     sleep 5
     if grep -qa 'HHC01412I Hercules terminated' "$LOG"; then

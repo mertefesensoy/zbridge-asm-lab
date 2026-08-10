@@ -172,20 +172,52 @@ s390x-linux-gnu-objdump --version
 
 **Do not install under `/mnt/c` or anywhere OneDrive can see.** DASD volume files are
 hundreds of megabytes and mutate continuously while Hercules runs; a syncing filesystem
-underneath them risks corruption. Install to a plain ext4 path inside WSL2 — `/root` is
-what this project's own evidence uses.
+underneath them risks corruption. Install to a plain ext4 path inside WSL2 — **your own
+home directory (`~`), not `/root`.** Earlier revisions of this document used `/root`,
+which is what this project's first evidence run happened to use — but `/root` is
+readable only by the `root` user. If you (like most WSL2 setups) log in as a regular
+user, an install under `/root` means every command in this section needs `sudo`, and
+you'll get a bare `Permission denied` with no other explanation the first time you try
+to skip it. Save yourself that discovery:
 
 ```bash
-mkdir -p /root/tk5dl && cd /root/tk5dl
+mkdir -p ~/tk5dl && cd ~/tk5dl
 curl -fL -o mvs-tk5.zip https://www.prince-webdesign.nl/images/downloads/mvs-tk5.zip
 sha256sum mvs-tk5.zip   # must match 710d0028...425f84, see §2
-unzip -q mvs-tk5.zip -d /root/
-chmod -R +x /root/mvs-tk5
+unzip -q mvs-tk5.zip -d ~/
+chmod -R +x ~/mvs-tk5
 ```
 
-That's the entire one-time setup. Nothing else needs installing — TK5 bundles its own
-Linux Hercules binary (`hercules/linux/64/bin/hercules`), so **no separate Hercules
-install and no 3270 terminal client are needed** for anything in this document.
+Nothing else needs installing — TK5 bundles its own Linux Hercules binary
+(`hercules/linux/64/bin/hercules`), so **no separate Hercules install and no 3270
+terminal client are needed** for anything in this document.
+
+### 4.4 Copy the harness into WSL2 (one-time)
+
+`mvsjob.sh` lives in the repository under `docs/runbooks/`, which on the Windows side
+means reaching it through `/mnt/c/...` — a path that, on most machines, contains spaces
+(`Program Files`-style installs elsewhere on the same PATH have caused real failures
+here — see the note below) and is easy to mistype. Copy it into WSL2 once, next to the
+TK5 install from §4.3, and every command from here on is short and doesn't cross the
+Windows/WSL2 boundary at all:
+
+```bash
+cp "/mnt/c/path/to/zbridge-asm-lab/docs/runbooks/mvsjob.sh" ~/mvsjob.sh
+chmod +x ~/mvsjob.sh
+```
+
+`mvsjob.sh` reads its TK5 location from `$HOME/mvs-tk5` by default (override with the
+`TK5_HOME` environment variable if yours lives somewhere else) — so as long as §4.3 and
+this step used the same user account, no further configuration is needed.
+
+**Why `mvsjob.sh` sanitizes its own `PATH` internally, and why that matters even if you
+never notice it:** WSL2 imports your entire Windows `PATH` into Linux by default —
+every `Program Files` entry, spaces and all. Hercules' own startup chain breaks on that
+(fails with something like `bash: line 1: C:/Program: No such file or directory`) the
+moment `mvsjob.sh` prepends to an inherited `PATH` containing those entries and
+re-exports it. The script now resets `PATH` to a clean, space-free base before doing
+anything else, so this shouldn't surface at all — but if you ever see an error shaped
+like that, it means something upstream is still handing Hercules a polluted `PATH`.
 
 ---
 
@@ -241,19 +273,21 @@ section was preparation; this section is the payoff.
 
 ### 6.1 Bring MVS up
 
-`mvsjob.sh` lives in this repository at `docs/runbooks/mvsjob.sh` and reads the TK5
-install location from the `TK5_HOME` environment variable (defaulting to
-`/root/mvs-tk5` if unset, which matches §4.3 above). Access the repository from WSL2
-via `/mnt/c/...` if you cloned it on the Windows side:
+From here on, everything runs from **inside a WSL2 terminal** — type `wsl` in
+PowerShell/Windows Terminal, or launch "Ubuntu" from the Start menu; you'll know
+you're there when the prompt looks like `yourname@yourpc:~$` rather than `PS C:\...>`.
+`mvsjob.sh` (copied into WSL2 once, per §4.4) reads the TK5 install location from the
+`TK5_HOME` environment variable, defaulting to `$HOME/mvs-tk5` — which matches §4.3, so
+in the normal case you don't need to set it at all:
 
 ```bash
-TK5_HOME=/root/mvs-tk5 /mnt/c/path/to/zbridge-asm-lab/docs/runbooks/mvsjob.sh up
+~/mvsjob.sh up
 ```
 
-**Expected output:** `MVS up after ~<N>s` — typically 30–60 seconds. **No 3270
-terminal, no operator, nothing to click.** The script arms Hercules' automatic-operator
-feature before IPL so the boot completes unattended; if it hasn't reported "up" within
-5 minutes, something is wrong (see §9).
+**Expected output:** `MVS up after ~<N>s` — typically 15–60 seconds on a freshly
+extracted install. **No 3270 terminal, no operator, nothing to click.** The script
+arms Hercules' automatic-operator feature before IPL so the boot completes unattended;
+if it hasn't reported "up" within 5 minutes, something is wrong (see §9).
 
 ### 6.2 Generate the E3 job — real bytes, built by Go, right now
 
@@ -282,26 +316,34 @@ omit it and the job uses a default message.
 
 ### 6.3 Submit it and watch it reach the console
 
+`zbe3go.jcl` was written on the Windows side in §6.2, so cross it into WSL2 first —
+still inside the same WSL2 terminal from §6.1:
+
 ```bash
-# copy zbe3go.jcl into WSL2 first if it was generated on the Windows side, e.g.:
-# cp /mnt/c/path/to/zbridge-asm-lab/zbridge/zbe3go.jcl /root/
-TK5_HOME=/root/mvs-tk5 /mnt/c/path/to/zbridge-asm-lab/docs/runbooks/mvsjob.sh run /root/zbe3go.jcl
+cp "/mnt/c/path/to/zbridge-asm-lab/zbridge/zbe3go.jcl" ~/
+~/mvsjob.sh run ~/zbe3go.jcl
 ```
 
 **Expected output** — this is the moment the demo is about:
 
 ```
 submitted ZBE3GO
-ZBE3GO ended after ~15s
+ZBE3GO ended after ~5s
 --------------- console messages for ZBE3GO ---------------
+07:39:25 / 5.39.24 JOB    1  $HASP100 ZBE3GO   ON READER1     E3 GO BYTES SVC35
 ...
-FFFF hh.mm.ss JOB    n  +ZBRIDGE LIVE DEMO
+07:39:25 / 5.39.25 JOB    1  +ZBRIDGE LIVE DEMO
+07:39:25 / 5.39.25 JOB    1  $HASP395 ZBE3GO   ENDED
 ...
---------------- output saved: /root/mvsjob-out/ZBE3GO.txt (NNN lines) ---------------
+--------------- output saved: ~/mvsjob-out/ZBE3GO.txt (NNN lines) ---------------
 IFOX00 RC= 0000   (assembler)
 IEWL   RC= 0000   (linker)
 GO     RC= 0000   (the SVC 35 itself)
 ```
+
+That `+ZBRIDGE LIVE DEMO` line — with your actual message — is the whole result. If you
+don't see it in the "console messages" block, check the raw log directly before
+assuming failure: `grep -a "<your message>" ~/mvs-tk5/log/hardcopy.log`.
 
 **What just happened, in one sentence:** a message built entirely by Go code running on
 this laptop was assembled into a mainframe program by a real assembler, linked by a
@@ -317,11 +359,17 @@ WTO — present and displayed, not blocked (see
 the emulated disk (see [`emulation-harnesses.md`](docs/architecture/emulation-harnesses.md) §3.4).
 
 ```bash
-TK5_HOME=/root/mvs-tk5 /mnt/c/path/to/zbridge-asm-lab/docs/runbooks/mvsjob.sh down
+~/mvsjob.sh down
 ```
 
-**Expected output:** `CLEAN STOP confirmed (HHC01412I) after ~<N>s`. If this doesn't
-appear within six minutes, see §9 — do **not** kill the process manually.
+**Expected output:** `CLEAN STOP confirmed (HHC01412I) after ~<N>s`, typically under
+90 seconds. If it hasn't appeared within six minutes, see §9 — do **not** kill the
+process manually. **If it does time out, don't panic and don't force-kill anything
+first** — send a harmless command to prove Hercules is still alive
+(`echo '/d t' > ~/tk5.fifo`, then check `tail ~/mvs-tk5/log/3033.log` for a reply a
+few seconds later) and simply run `~/mvsjob.sh down` again. That sequence — a
+responsive system whose shutdown request just didn't land — is a known, recoverable
+state, not disk corruption.
 
 ---
 
@@ -357,13 +405,14 @@ audience.
 
 | Step | Time |
 |---|---|
-| MVS boot (§6.1) | 30–60 seconds, occasionally up to 90 — the only slow part |
+| MVS boot (§6.1) | 15–60 seconds on a fresh install |
 | Generating the job (§6.2) | instant |
-| Submit → console message (§6.3) | ~15–20 seconds |
-| Shutdown (§6.4) | 15–30 seconds |
+| Submit → console message (§6.3) | ~5–20 seconds |
+| Shutdown (§6.4) | Typically under 90 seconds; budget up to a few minutes |
 
-Start the boot early and talk over it — it's the only step worth padding your talk
-around.
+If you're closing the demo and moving to Q&A, kick off `~/mvsjob.sh down` first and let
+it finish in the background of your closing remarks (§7.5) rather than standing at the
+terminal waiting for it.
 
 ### 7.3 The script itself
 
@@ -429,7 +478,9 @@ written exactly for this moment.
 | `mvsjob.sh down` never sees `HHC01412I` | Something is blocking shutdown | **Do not kill the process.** Wait longer, or consult `docs/runbooks/tk5-hercules-setup.md` §12 Trap 7 |
 | Cross-compile (§3.2) fails on `add/` | Expected — see §3.2 | Not a bug; `add/` is excluded by design |
 | `qemu-s390x` not found | Package not installed, or wrong distro | Re-run §4.2; confirm you're inside the WSL2 shell, not PowerShell |
-| DASD/disk corruption, MVS won't IPL after a crash | An unclean stop happened at some point | Delete `/root/mvs-tk5`, re-unpack from the zip (§4.3) — the SHA-256 in §2 means this is always a safe, cheap recovery |
+| DASD/disk corruption, MVS won't IPL after a crash | An unclean stop happened at some point | Delete `~/mvs-tk5`, re-unpack from the zip (§4.3) — the SHA-256 in §2 means this is always a safe, cheap recovery |
+| `Permission denied` on any `mvsjob.sh`/TK5 command | Install lives under `/root` but you're not running as `root` | Move it to `~/mvs-tk5` (§4.3) instead — this is the fix, not `sudo` on every command going forward |
+| Shutdown times out without `HHC01412I` | The shutdown request may not have been processed yet | Confirm Hercules is still responsive (`echo '/d t' > ~/tk5.fifo`, check the log a few seconds later), then simply run `~/mvsjob.sh down` again — see §6.4 |
 
 For anything not covered here, `docs/runbooks/tk5-hercules-setup.md` §10 and §12 have
 the full, narrated troubleshooting history from when this was first set up, including
