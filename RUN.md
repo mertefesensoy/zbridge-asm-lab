@@ -317,24 +317,95 @@ appear within six minutes, see §9 — do **not** kill the process manually.
 
 ## 7. The demo script — a suggested live run-through
 
-For presenting this live, in order, with what to say at each step:
+This section is written to be read from **during** a presentation, not learned from —
+keep it open on a second screen. §7.1–§7.2 are done before anyone is watching; §7.3 is
+the live sequence; §7.4 is what to do if something goes sideways in front of an
+audience; §7.5 is how to land it.
+
+### 7.1 Pre-flight checklist — the night before or the morning of, never live
+
+Do every one of these *before* anyone is watching. None of them belongs in front of an
+audience.
+
+- [ ] `go build ./...` and `go test ./...` pass clean in `zbridge/` right now, on the
+      exact machine you'll present from (§3.1).
+- [ ] WSL2 is up, TK5 is already unpacked at its install path, and its zip hash still
+      matches §2 (you verified this once at setup time — no need to redo the download,
+      just confirm the install is the one you tested against).
+- [ ] MVS is currently **down** — start the day from a known-clean state (§6.1), not
+      mid-session from whatever it was left in last time you tested.
+- [ ] **Run the entire demo end to end at least once**, today, on this machine, with a
+      message you actually intend to use. A dress rehearsal is what turns "I read the
+      instructions" into "I've done this."
+- [ ] Have this file and [`docs/evidence/E1-E3-wto-layout-and-svc35-2026-07-26.md`](docs/evidence/E1-E3-wto-layout-and-svc35-2026-07-26.md)
+      open in tabs before you start — the second one is your fallback (§7.4).
+- [ ] Decide your message in advance even if you plan to take a live suggestion —
+      having a known-good fallback message ready costs nothing and removes one
+      variable.
+
+### 7.2 Timing budget
+
+| Step | Time |
+|---|---|
+| MVS boot (§6.1) | 30–60 seconds, occasionally up to 90 — the only slow part |
+| Generating the job (§6.2) | instant |
+| Submit → console message (§6.3) | ~15–20 seconds |
+| Shutdown (§6.4) | 15–30 seconds |
+
+Start the boot early and talk over it — it's the only step worth padding your talk
+around.
+
+### 7.3 The script itself
 
 1. **"Here's the library."** Open [`zbridge/console/wpl.go`](zbridge/console/wpl.go) —
    `EncodeWPL` is pure Go, no assembly, runs anywhere.
 2. **Run `go test ./...` in `zbridge/`** (§3.1) — point at
    `TestEncodeWPLMatchesIBMMacro` passing: *"this asserts our output matches bytes a
    real IBM macro produced, byte for byte."*
-3. **`mvsjob.sh up`** (§6.1) — while it boots (30–60s), this is a good moment to show
+3. **`mvsjob.sh up`** (§6.1) — while it boots, this is a good moment to show
    [`docs/architecture/c4/level1-context.svg`](docs/architecture/c4/README.md) and
    explain the shape of the project.
 4. **`go run ./cmd/gen-e3 "<a message the audience suggests>"`** (§6.2) — take a live
-   suggestion for the message text; show the bytes printed to stderr.
+   suggestion for the message text, or use your pre-decided fallback message from
+   §7.1; show the bytes printed to stderr.
 5. **`mvsjob.sh run zbe3go.jcl`** (§6.3) — the payoff. Point at the `+<message>` line
    and the three `RC= 0000` lines.
 6. **`mvsjob.sh down`** (§6.4) — always end clean.
 
-Total live time once MVS is up: under a minute per message. Boot (step 3) is the only
-slow part, so start it early and talk over it.
+Total live time once MVS is up: under a minute per message.
+
+### 7.4 If something breaks live
+
+An emulator, a network socket, and a live audience is a lot of moving parts. If a step
+stalls or errors, **don't debug live** — narrate and fall back.
+
+1. **Say it plainly, once:** *"This is an emulator quirk — it's documented in our own
+   runbook, not a flaw in the result I'm about to show you."* This is true (§8 lists
+   the known failure modes) and said once, confidently, it reads as competence, not
+   panic.
+2. **Show the captured proof instead.**
+   [`docs/evidence/E1-E3-wto-layout-and-svc35-2026-07-26.md`](docs/evidence/E1-E3-wto-layout-and-svc35-2026-07-26.md)
+   §3 has the exact console line, the exact bytes, and all three return codes from a
+   real run — walk through that file instead of the live terminal. The result is just
+   as real; only the "live" part is missing.
+3. **Do not restart the emulator mid-demo.** A second boot attempt live, in front of
+   people, burns another 30–60 seconds you don't have and risks a second failure.
+   Finish the point from the evidence file and move on.
+4. **If it's the shutdown step that hangs** (§8), it's safe to simply leave it running
+   and deal with it after the audience has left — an unclean stop is a laptop
+   housekeeping problem, not something that affects what you just showed them.
+
+### 7.5 Landing it
+
+Close with the one-sentence version, not a recap of every step:
+
+> *"That's the whole result: bytes built entirely by Go, accepted by a real `SVC 35`,
+> with no C anywhere in the path — the first published proof that this is possible."*
+
+Then bridge to questions with: *"I've documented the byte-level format and the one
+open question — what happens on the real system's return code — in detail if you want
+to go deeper,"* pointing at [`START_HERE.md`](START_HERE.md) §4. That section is
+written exactly for this moment.
 
 ---
 
