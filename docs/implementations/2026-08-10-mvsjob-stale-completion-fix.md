@@ -1,7 +1,7 @@
 # `mvsjob.sh`: scope completion detection to the current submission, not the whole log
 
 **Date:** 2026-08-10
-**Author:** Claude Sonnet 5, in session with Mert Efe Şensoy
+**Author:** Mert Efe Şensoy
 **Status:** shipped
 
 ---

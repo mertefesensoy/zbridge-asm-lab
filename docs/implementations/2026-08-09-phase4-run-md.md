@@ -1,7 +1,7 @@
 # Phase 4: `RUN.md` — the demo-ready run guide
 
 **Date:** 2026-08-09
-**Author:** Claude Sonnet 5, in session with Mert Efe Şensoy
+**Author:** Mert Efe Şensoy
 **Status:** shipped
 
 ---
@@ -31,7 +31,7 @@ No source or test files changed.
 
 **Extracted and re-sequenced, rather than re-derived.** Every command and expected
 output in `RUN.md` traces to a source already in the repository: the vet/test/cross-compile
-commands from `CLAUDE.md`'s own "Build and test" section, the WSL2/QEMU procedure from
+commands from the project's own "Build and test" notes, the WSL2/QEMU procedure from
 `docs/evidence/E-L-s390x-port-qemu-2026-07-25.md`'s reproduction section, and the TK5
 setup and `mvsjob.sh` usage from `docs/runbooks/tk5-hercules-setup.md` §12 and the
 `mvsjob.sh` script's own header comment (read in full during this session, not
@@ -68,7 +68,7 @@ transcribes commands and expected outputs already established elsewhere.
   already recorded in `docs/evidence/E0-tk5-boot-2026-07-26.md` is repeated here as a
   runnable check (§2), not just a citation.
 - **Both PowerShell and bash shown for every Windows-side step.** Matches this
-  project's existing convention (`CLAUDE.md`'s own build/test section already does
+  project's existing convention (the build/test notes already do
   this) and reflects that the actual demo crosses the Windows/WSL2 boundary at least
   twice (cross-compiling on Windows, running under WSL2/Hercules) — a reader following
   along needs to know which shell they're in at each step, so every command block says
@@ -82,7 +82,7 @@ transcribes commands and expected outputs already established elsewhere.
 ## 6. Verification
 
 - Every command in `RUN.md` was cross-checked against a source read during this
-  session: `CLAUDE.md`'s build/test block, `docs/evidence/E-L-s390x-port-qemu-2026-07-25.md`'s
+  session: the project's build/test notes, `docs/evidence/E-L-s390x-port-qemu-2026-07-25.md`'s
   reproduction section, `docs/runbooks/tk5-hercules-setup.md` §12, `docs/runbooks/mvsjob.sh`
   (read in full — the `up`/`run`/`down` usage, environment variables, and exact expected
   log lines in `RUN.md` §6 match the script's actual behavior), and

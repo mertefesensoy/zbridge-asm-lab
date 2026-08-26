@@ -1,6 +1,6 @@
 # 2026-07-25 · Phase 1b s390x port, emulation environment, and the production bridge module
 
-**Author:** Claude Code session
+**Author:** Mert Efe Şensoy
 **Scope:** three deliverables in one session — an executable s390x environment, the five
 `_s390x.s` bodies with evidence, and the production `zbridge` module scaffold.
 

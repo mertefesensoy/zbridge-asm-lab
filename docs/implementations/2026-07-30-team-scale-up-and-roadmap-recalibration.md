@@ -1,7 +1,7 @@
 # Team scale-up to five, roadmap recalibration to AY 2026–27, and the replacement mentor email
 
 **Date:** 2026-07-30
-**Author:** Claude (architecture role), on owner direction in session
+**Author:** Mert Efe Şensoy
 **Status:** shipped — except the mentor email, which is **drafted and unsent** by design
 
 ---
@@ -13,7 +13,7 @@ Four things came together and none of them could be addressed alone.
 **The project acquired four more people.** It was written, planned, and executed as a solo
 thesis project. Every planning artifact in the repository assumes one contributor: the
 roadmap's time budget (p.7) says "5-8 hours per week", the doctrine's autonomy boundaries
-address "the owner", and the review discipline lived in one person's head plus `CLAUDE.md`.
+address "the owner", and the review discipline lived in one person's head plus local notes.
 None of that survives four more contributors unchanged.
 
 **The plan's dates were spent.** The roadmap's phase table (p.3) runs on 2026 calendar
@@ -25,7 +25,7 @@ gates everything downstream (IBM's Go fork).
 Neither was delivered, so every question in them — including the two that block Phase 3 — had
 been sitting unasked. There was no artifact that could be *sent* rather than *presented*.
 
-**The repository's own state documents had gone stale in ways that would mislead.** `CLAUDE.md`
+**The repository's own state documents had gone stale in ways that would mislead.** The standing rules
 still said *"Rung E0 is still unrun and is the owner's chosen next milestone"* — four days
 after E0 through E3 all passed. `memory/MEMORY.md`'s active plan still listed rung E0 as action
 1 and research brief 003 as unrun, and its boundaries section still said
@@ -43,7 +43,7 @@ reading either file would have started on work that was already finished, and mi
 | `.github/pull_request_template.md` | **New.** The merge gate made concrete — the "which unknown does this retire" question, the claims check, run-not-reasoned verification, and the evidence/assembly checklists. |
 | `docs/mentor-briefings/2026-07-30-progress-and-hercules.md` | **New.** The replacement for the undelivered 2026-07-27 pair, written as an email. Carries progress, the Hercules account, the three roadmap corrections, the team note, and six questions. **Marked DRAFT / NOT SENT.** |
 | `docs/roadmap-errata.md` | Added scope change **S4** (phase windows and solo time budget superseded) and a fourth entry under "structures the roadmap does not contain" (the team structure and PR gate). |
-| `CLAUDE.md` | "Current state" rewritten — it claimed rung E0 was unrun. Three rows added to the "where things are" table. Errata count corrected from three to four corrections plus four scope changes. |
+| project standing rules | "Current state" rewritten — it claimed rung E0 was unrun. Three rows added to the "where things are" table. Errata count corrected from three to four corrections plus four scope changes. |
 | `memory/MEMORY.md` | "Active plan" rewritten (it listed finished work as next actions); ADR 0005 added to decisions of record; the `LayoutVerified = false` boundary corrected; three session-log entries added for 07-26, 07-27 and 07-30. |
 
 **No code changed.** Not one line of Go or assembly. This is a planning and documentation
@@ -208,7 +208,7 @@ Linux-constrained by design).
    confirm the cell matches the file.
 2. `docs/roadmap-errata.md` S4 should agree with ADR 0005 §5. If they disagree, the errata is
    wrong by construction — the ADR governs.
-3. `CLAUDE.md` "Current state" and `memory/MEMORY.md` "Current state" should now agree with each
+3. The standing rules' "Current state" and `memory/MEMORY.md` "Current state" should now agree with each
    other and with the evidence files. Before this change they did not.
 
 ## 7. Related Docs

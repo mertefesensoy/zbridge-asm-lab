@@ -59,8 +59,7 @@ See [ADR 0001](docs/decisions/0001-emulation-strategy-hercules-two-track.md).
 
 **[`zbridge-asm-roadmap.pdf`](zbridge-asm-roadmap.pdf)** (repo root, 8 pages) is the
 project mandate — phase definitions, the WTO endgame rationale, the risk register,
-and the open questions for the mentor. **[`docs/goal-prompt.md`](docs/goal-prompt.md)**
-is the operating doctrine derived from it.
+and the open questions for the mentor.
 
 | Directory | Contents |
 |---|---|
@@ -74,3 +73,12 @@ is the operating doctrine derived from it.
 
 Start with [ADR 0001](docs/decisions/0001-emulation-strategy-hercules-two-track.md)
 and [the baseline strategy](docs/mainframe-baseline-strategy.md).
+
+## Tooling and authorship
+
+The engineering work, the architectural decisions, and every verification result in
+this repository are the author's own. Documentation drafting and external research
+were carried out with AI assistance. Research returns are stored verbatim with their
+sources under `research/` precisely so that each external claim can be audited
+against primary sources independently of how it was gathered — a discipline that has
+already caught two returns whose citation detail did not survive checking.

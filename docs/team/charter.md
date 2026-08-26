@@ -191,8 +191,8 @@ There is no fourth category. Hedged guessing is the specific thing this box exis
 | `zbridge/**` public API | CI | 1 reviewer + W2 |
 | anything else | CI | 1 reviewer |
 
-The hooks in `.claude/hooks/` (`asm-gate.ps1`, `convention-guard.ps1`) and the subagents in
-`.claude/agents/` already exist and already do this work locally. **CI does not exist yet** —
+The local pre-commit hooks (`asm-gate.ps1`, `convention-guard.ps1`) and the review agents
+already exist and already do this work locally. **CI does not exist yet** —
 standing it up is W3's first ticket, and until then these gates are honoured by hand.
 
 ### Two automatic rejections
@@ -240,7 +240,7 @@ A ticket is done when — from `docs/goal-prompt.md` §6:
 
 Roughly two hours. It is the whole context.
 
-1. **`CLAUDE.md`** — the standing rules, and the ones that are easy to break helpfully.
+1. **The project's standing rules** — including the ones that are easy to break helpfully.
 2. **`docs/goal-prompt.md`** — the doctrine. §4 is the part that makes this project different.
 3. **`zbridge-asm-roadmap.pdf`** (8 pages) — the mandate. **Then `docs/roadmap-errata.md`**,
    because four of its statements are superseded and one produces a broken parameter list if

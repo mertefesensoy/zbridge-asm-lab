@@ -1,7 +1,7 @@
 # `mvsjob.sh`: fix `/root`-only access and the `shutdown` script that doesn't shut down
 
 **Date:** 2026-08-10
-**Author:** Claude Sonnet 5, in session with Mert Efe Şensoy
+**Author:** Mert Efe Şensoy
 **Status:** shipped
 
 ---

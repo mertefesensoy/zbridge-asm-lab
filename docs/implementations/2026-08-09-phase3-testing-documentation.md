@@ -1,7 +1,7 @@
 # Phase 3: testing documentation
 
 **Date:** 2026-08-09
-**Author:** Claude Sonnet 5, in session with Mert Efe Şensoy
+**Author:** Mert Efe Şensoy
 **Status:** shipped
 
 ---

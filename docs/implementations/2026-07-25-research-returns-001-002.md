@@ -124,7 +124,7 @@ Options considered: (a) file as an `E`-rung — rejected, it executes nothing an
 provenance header exists precisely to stop that kind of blurring; (b) bury it in H001 —
 rejected, H001 must preserve pre-registration text and a 25-page source check needs to
 be citable on its own; (c) put it in `research/` — rejected, that directory is Gemini's
-verbatim returns and mixing Claude-authored analysis in erodes the role split that
+verbatim returns and mixing project-authored analysis in erodes the role split that
 makes the returns auditable. `DOC` is marked provisional and flagged for owner review.
 
 **Do not touch ADR 0001.** The C4 finding puts a specific ADR 0001 §6 table entry in

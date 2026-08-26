@@ -81,8 +81,8 @@ The rule's value is that the failure is *typed and specific*. A caller gets
 `ErrLayoutUnverified` with a message pointing at brief 003 — not a panic, not a wrong
 answer, and not a silently-plausible parameter list.
 
-This is the production-module analogue of the lab's `UNDEF` convention (CLAUDE.md
-hard rule 1), and the difference is deliberate: `UNDEF` is correct for a teaching
+This is the production-module analogue of the lab's `UNDEF` convention (a standing
+project rule), and the difference is deliberate: `UNDEF` is correct for a teaching
 exercise where a build failure is the lesson, and wrong for a library, which must
 compile and be importable on a developer's laptop. **Same principle — fail loudly,
 never silently — different mechanism because the consumer is different.**

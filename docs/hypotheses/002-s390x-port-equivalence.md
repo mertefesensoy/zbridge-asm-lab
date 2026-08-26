@@ -4,7 +4,7 @@
   See "Resolution" at the end of this file. Everything between here and that section
   is the original pre-registration text, preserved unchanged.
 - Date: 2026-07-25
-- Author: Claude (hypothesis and architecture role)
+- Author: Mert Efe Şensoy
 - Ladder rung: E-L (Track L / QEMU), feeding T2 on real hardware
 - Builds on: ADR 0001 §5 (Track L time-boxed, QEMU as the Phase 1b inner loop);
   the roadmap's Phase 1b deliverable; `docs/mainframe-baseline-strategy.md` §4 (the

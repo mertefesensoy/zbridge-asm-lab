@@ -17,7 +17,7 @@ The repository root holds six small teaching modules (`add/`, `ebcdic/`, `strman
 `zbridge/` is a **seventh, separate Go module**, also with its own `go.mod`, living in
 its own subdirectory.
 
-This isn't an accident of growth — it's a rule (`CLAUDE.md` hard rule 7): **per-exercise
+This isn't an accident of growth — it's a standing project rule: **per-exercise
 `go.mod`, no cross-imports.** The lab modules exist to rehearse one concept each in
 isolation (what does a Go string header actually look like in memory? what does the
 hardware stack pointer look like vs. the pseudo-register named `SP`?), and letting them
@@ -91,7 +91,7 @@ quite literally true.
 
 **Provenance:** the tables are derived from `ibmruntimes/go-recordio` (BSD-3-Clause) and
 cross-checked against ICU's official `ibm-1047_P100-1995.ucm` mapping file. Attribution
-lives in `codepage/LICENSES.md` and — per `CLAUDE.md` hard rule 6 — must survive any
+lives in `codepage/LICENSES.md` and — per the project's attribution rule — must survive any
 future refactor.
 
 ---
@@ -351,7 +351,7 @@ distinction:
   path is complete; what's missing is a citable primary source for a byte layout.
 
 This mirrors, deliberately, the lab modules' `UNDEF`-stub convention
-(`CLAUDE.md` hard rule 1) — **fail loudly and specifically, never quietly** — but
+(a standing project rule) — **fail loudly and specifically, never quietly** — but
 through a different mechanism, because the audience is different. An `UNDEF` stub is
 correct for a *teaching exercise*, where making the build fail is the whole lesson.
 It's wrong for a *library*, which has to compile and be testable on an ordinary

@@ -154,7 +154,7 @@ directly.
 
 ### 4.2 Why this project refuses that path
 
-The project's standing rule, stated plainly in [`CLAUDE.md`](../../CLAUDE.md) and
+The project's standing rule, stated plainly in
 [ADR 0004](../decisions/0004-roadmap-corrections-and-cgo-scope-closure.md) §3: **never
 cgo, not even as a fallback.** Two reasons, one practical and one architectural:
 

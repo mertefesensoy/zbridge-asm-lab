@@ -2,7 +2,7 @@
 
 - Status: **Accepted**
 - Date: 2026-07-27
-- Author: Claude (architecture role)
+- Author: Mert Efe Şensoy
 - Decided by: **Mert Efe Şensoy (owner)**, 2026-07-27, in session
 - Supersedes: three specific statements in `zbridge-asm-roadmap.pdf` (§2 below), and
   closes the roadmap's open question 1 (§3). Amends the Phase 1b and Phase 2 deliverable
@@ -191,8 +191,8 @@ transferable to WTO.
 ## 6. Decision: an errata page, not an edited PDF
 
 `docs/roadmap-errata.md` lists every superseded roadmap statement with its correction and
-the ADR and evidence that supersede it, and is linked from `CLAUDE.md` and
-`docs/goal-prompt.md` §8.
+the ADR and evidence that supersede it, and is linked from the project's standing
+rules and doctrine notes.
 
 Considered and rejected: regenerating the roadmap PDF with corrections marked inline. The
 PDF is the mentor-facing mandate and the historical record of what was believed in June;

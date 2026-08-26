@@ -33,7 +33,7 @@
 
 - Status: **ANSWERED** — returned 2026-07-26
 - Date: 2026-07-25
-- Requested by: Claude (architecture role)
+- Requested by: Mert Efe Şensoy
 - Consumed by: `docs/hypotheses/001-mvs38j-svc35-wto-oracle.md` — C1, C2 and C4; `docs/decisions/0001-emulation-strategy-hercules-two-track.md` §6 (the Phase 3b retirement table)
 - Return: `research/003-wto-wpl-layout-source-and-return-code-contract.md`
 - Supersedes the unmet parts of brief 001. **Does not** re-ask what 001 answered well.
@@ -55,7 +55,7 @@ list byte layout is not documented in that manual at all.** The `WTO (List Form)
 section describes only macro syntax and refers the reader back to the standard form.
 The quotation the return attributed to it does not appear in it.
 
-That was Claude's error as much as the researcher's: brief 001 named the wrong
+That was our error as much as the researcher's: brief 001 named the wrong
 manual and asked for a verbatim quotation from a book that does not contain the
 material. **This brief's first job is to find the right book.**
 
@@ -219,7 +219,7 @@ happens when corroboration is presented with a primary-source label.
   If a single-line WTO issues no return code on the ancestor system, step 6
   (*"Read R15, map to a Go error"*) is **not** retirable by rung E3 and the ADR needs
   an owner-approved amendment. Per `docs/goal-prompt.md` §5 boundary 4, that
-  amendment is the owner's call, not Claude's.
+  amendment is the owner's call, not the architecture role's.
 - **Q6** becomes the cross-check against the E1 listing.
 
 If Q4 shows the two systems genuinely diverge on the return-code contract, that is a

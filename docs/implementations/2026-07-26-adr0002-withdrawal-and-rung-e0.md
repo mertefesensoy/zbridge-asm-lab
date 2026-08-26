@@ -30,7 +30,7 @@ mentor, and demonstrate that the project is not blocked — by actually advancin
 | `docs/evidence/E0-tk5-boot-2026-07-26.md` | **New.** Rung E0 evidence with provenance header, all three gates, every ⚠ VERIFY item answered, and an operational-lessons section recording three unclean stops |
 | `docs/runbooks/tk5-hercules-setup.md` | Header status → E0 PASSED with a pointer to §12; **new §12** with the headless WSL2 procedure, two new traps, and the verified device/port table |
 | `docs/goal-prompt.md` | Directive 4 corrected; U3 unsplit; current-position block rewritten for E0 and the withdrawal |
-| `CLAUDE.md` | Hercules directive corrected — Hercules mandated, z/OS guest ruled out |
+| project standing rules | Hercules directive corrected — Hercules mandated, z/OS guest ruled out |
 | `memory/MEMORY.md` | E0 passed; ADR 0002 withdrawn; E1 identified as the next and most important rung |
 
 No source code changed. No test changed. That is the point of §3.1.

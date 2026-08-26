@@ -2,7 +2,7 @@
 
 - Status: **Accepted**
 - Date: 2026-07-30
-- Author: Claude (architecture role)
+- Author: Mert Efe Şensoy
 - Decided by: **Mert Efe Şensoy (owner and team lead)**, 2026-07-30, in session
 - Supersedes: the phase-window column of the roadmap's phase table (`zbridge-asm-roadmap.pdf`
   p.3) and the single-contributor time budget in its risk register (p.7)
@@ -74,7 +74,7 @@ section fixes only the *shape*.
 
 ## 4. Decision: contribution flows through a ticket → PR gate, and doctrine is enforced at it
 
-Solo, the project's doctrine was held in one person's head and in `CLAUDE.md`. That does not
+Solo, the project's doctrine was held in one person's head and in local notes. That does not
 survive four more contributors. The doctrine therefore moves to the merge gate.
 
 Every change enters as a ticket, leaves as a pull request, and a PR does not merge until the

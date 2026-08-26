@@ -2,7 +2,7 @@
 
 - Status: **ANSWERED (PARTIAL)** — returned 2026-07-25, audited 2026-07-25
 - Date: 2026-07-25
-- Requested by: Claude (architecture role)
+- Requested by: Mert Efe Şensoy
 - Consumed by: `docs/hypotheses/001-mvs38j-svc35-wto-oracle.md` — **Line 1
   (documentary)**
 - Priority: **highest open item.** Rung E2 cannot be designed without it.
@@ -156,7 +156,7 @@ The brief is answerable and closed when:
 ## How the result will be used
 
 The return lands at `research/001-wto-parameter-list-authoritative-layout.md`.
-Claude then folds it into H001 as Line 1 evidence and designs rung E2's hand-built
+The lead then folds it into H001 as Line 1 evidence and designs rung E2's hand-built
 parameter list against it. **If Line 1 and the E1 assembler listing disagree, the
 listing wins for the MVS side** (H001's tie-break clause) — and that disagreement is
 itself recorded as a finding, because it would mean a published manual is wrong or

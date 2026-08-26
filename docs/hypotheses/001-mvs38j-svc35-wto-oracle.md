@@ -3,7 +3,7 @@
 - Status: **IN PROGRESS** (updated 2026-07-25). Line 1 partially returned and audited
   against primary source. Lines 2 and 3 not run. **No sub-claim is resolved.**
 - Date: 2026-07-25
-- Author: Claude (hypothesis and architecture role)
+- Author: Mert Efe Şensoy
 - Ladder rung: E2 (documentary + TK5 empirical), closed at T3 (z/OS empirical)
 - Builds on: ADR 0001 (`docs/decisions/0001-emulation-strategy-hercules-two-track.md`),
   which adopts Track M explicitly *without* assuming this hypothesis; the roadmap's
