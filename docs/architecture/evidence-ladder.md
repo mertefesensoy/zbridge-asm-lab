@@ -86,7 +86,10 @@ signal that turned out to mean nothing) is in
 one reason: they're why the project's rule became **"`HHC01412I Hercules terminated` in
 the log is the only accepted proof of a clean stop — not the absence of a running
 process."** Process absence is equally consistent with a clean shutdown and with a kill
-mid-write, and only one of those leaves the emulated disk trustworthy.
+mid-write, and only one of those leaves the emulated disk trustworthy. *(Tightened
+2026-10-21: the proof is one complete Hercules shutdown ending in `HHC01412I`, followed
+by the process exiting. A second `quit` forges `HHC01412I` on its own — runbook §12
+Trap 8.)*
 
 ---
 

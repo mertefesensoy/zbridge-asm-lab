@@ -220,9 +220,11 @@ The whole thing runs inside a WSL2 Linux environment specifically so the emulato
 virtual disks live on a real Linux filesystem rather than under OneDrive or on NTFS —
 both of which introduce failure modes (sync interference, path/locking issues) that
 have nothing to do with the mainframe work itself. Full operational detail, including
-several real mistakes made and turned into standing rules (most importantly: **only
-`HHC01412I Hercules terminated` in the log counts as proof of a clean shutdown** — a
-process simply no longer running is not proof of anything), is in
+several real mistakes made and turned into standing rules (most importantly: **a clean
+shutdown is one complete Hercules shutdown ending in `HHC01412I Hercules terminated`,
+followed by the process exiting**. A process simply no longer running is not proof of
+anything, and since 2026-10-21 neither is `HHC01412I` alone, because a second `quit`
+forges it; MVS must also be shut down before Hercules — runbook §12 Trap 8), is in
 `docs/evidence/E0-tk5-boot-2026-07-26.md` and the runbook at
 `docs/runbooks/tk5-hercules-setup.md`.
 
