@@ -259,10 +259,12 @@ sequenceDiagram
     J->>P: listing, 212 lines
     Note over H,P: printer drain is ASYNCHRONOUS —<br/>$HASP395 means ended, not printed
     P->>H: poll until the file stops growing
-    H->>H: shutdown, verified by HHC01412I only
+    H->>H: MVS shutdown, then Hercules; verified by<br/>one complete shutdown + process exit
 ```
 
-The last note is a rule, not a caution: `HHC01412I Hercules terminated` is the only
-accepted proof of a clean stop. Process absence proves nothing — it is equally consistent
-with a kill mid-write, which is how three sets of DASD volumes were made untrustworthy on
-2026-07-26.
+The last note is a rule, not a caution. A clean stop is one complete Hercules shutdown
+ending in `HHC01412I Hercules terminated`, followed by the process exiting. Process
+absence proves nothing: it is equally consistent with a kill mid-write, which is how
+three sets of DASD volumes were made untrustworthy on 2026-07-26. Since 2026-10-21,
+`HHC01412I` on its own proves nothing either, because a second `quit` forges it, and
+Hercules hangs unless MVS is shut down first (runbook §12 Trap 8).

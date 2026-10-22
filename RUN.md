@@ -203,8 +203,14 @@ Windows/WSL2 boundary at all:
 
 ```bash
 cp "/mnt/c/path/to/zbridge-asm-lab/docs/runbooks/mvsjob.sh" ~/mvsjob.sh
+sed -i 's/\r$//' ~/mvsjob.sh
 chmod +x ~/mvsjob.sh
 ```
+
+The `sed` line strips Windows line endings. Git for Windows checks text files out with
+CRLF endings by default (`core.autocrlf=true`), and bash then fails on the first line
+with `$'\r': command not found`. Repeat all three lines whenever `mvsjob.sh` changes in
+the repository.
 
 `mvsjob.sh` reads its TK5 location from `$HOME/mvs-tk5` by default (override with the
 `TK5_HOME` environment variable if yours lives somewhere else) — so as long as §4.3 and
@@ -377,14 +383,27 @@ the emulated disk (see [`emulation-harnesses.md`](docs/architecture/emulation-ha
 ~/mvsjob.sh down
 ```
 
-**Expected output:** `CLEAN STOP confirmed (HHC01412I) after ~<N>s`, typically under
-90 seconds. If it hasn't appeared within six minutes, see §9 — do **not** kill the
-process manually. **If it does time out, don't panic and don't force-kill anything
-first** — send a harmless command to prove Hercules is still alive
-(`echo '/d t' > ~/tk5.fifo`, then check `tail ~/mvs-tk5/log/3033.log` for a reply a
-few seconds later) and simply run `~/mvsjob.sh down` again. That sequence — a
-responsive system whose shutdown request just didn't land — is a known, recoverable
-state, not disk corruption.
+`down` shuts MVS down first, using TK5's own sequence: SHUTNOW, `$PJES2`, `Z EOD`,
+`QUIESCE`. It prints one line per step. Only then does it power Hercules off. With MVS
+still running, the power-off alone hangs Hercules (runbook §12 Trap 8). It takes
+**about 2 minutes**. If you run it within about 80 seconds of `up`, it first waits for
+TK5 to finish starting, so it takes longer.
+
+**Expected last line:** `CLEAN STOP confirmed: one shutdown through HHC01412I, and the
+process exited`. `down` exits 0.
+
+The other two outcomes, and what to do:
+
+- **Exit 2, `FORCED STOP (not clean); disks verified`.** Hercules hung after closing
+  every disk and printer file. `down` then killed it, checked every volume read-only, and
+  wrote the event into the console log and into a report under `~/mvsjob-out/`. This
+  should only happen when one of the MVS steps failed; the report says which. It is
+  **not** a clean stop. The disks passed the check, but start any evidence run from a
+  fresh extract (§4.3).
+- **Exit 1.** The stop could not be verified, and **nothing was killed**. Read the report
+  under `~/mvsjob-out/`. It is safe to run `~/mvsjob.sh down` again later: once a
+  shutdown has begun it sends nothing more, and only watches. **Never** send `quit` by
+  hand. A second `quit` prints a fake `HHC01412I` (runbook §12 Trap 8).
 
 ---
 
@@ -423,7 +442,7 @@ audience.
 | MVS boot (§6.1) | 15–60 seconds on a fresh install |
 | Generating the job (§6.2) | instant |
 | Submit → console message (§6.3) | ~5–20 seconds |
-| Shutdown (§6.4) | Typically under 90 seconds; budget up to a few minutes |
+| Shutdown (§6.4) | About 2 minutes (MVS first, then Hercules); longer if started within ~80 s of `up` |
 
 If you're closing the demo and moving to Q&A, kick off `~/mvsjob.sh down` first and let
 it finish in the background of your closing remarks (§7.5) rather than standing at the
@@ -465,9 +484,11 @@ stalls or errors, **don't debug live** — narrate and fall back.
 3. **Do not restart the emulator mid-demo.** A second boot attempt live, in front of
    people, burns another 30–60 seconds you don't have and risks a second failure.
    Finish the point from the evidence file and move on.
-4. **If it's the shutdown step that hangs** (§8), it's safe to simply leave it running
-   and deal with it after the audience has left — an unclean stop is a laptop
-   housekeeping problem, not something that affects what you just showed them.
+4. **If the shutdown step is slow** (§8), let `down` run in the background while you
+   take questions, and don't close that terminal. It finishes on its own. Its timeouts add
+   up to at most 16 minutes, and a normal stop takes about 2. Its last line tells you whether the
+   stop was clean (exit 0), forced with the disks verified (exit 2), or needs attention
+   (exit 1). None of these affects what you just showed the audience.
 
 ### 7.5 Landing it
 
@@ -490,12 +511,13 @@ written exactly for this moment.
 | `mvsjob.sh up` never reports "MVS up" within 5 minutes | `TK5_HOME` wrong, or a stale Hercules instance already running | `pgrep -f 'hercules -f conf/tk5.cnf'` — if it prints more than one PID, do **not** proceed; see §9's note on multiple instances |
 | `submit failed` in `mvsjob.sh run` | MVS isn't actually up yet, or wrong `TK5_HOME` | Confirm `up` reported success first; check `$T/log/3033.log` for `IEE136I LOCAL:` |
 | No `+<message>` line appears after submit | JCL error — check the tail of `$T/log/3033.log` for `IEF452I` or `IEF642I` | The programmer-name field on the JOB card is capped at 20 characters on MVS 3.8j — this is why `gen-e3`'s JOB card is short and fixed |
-| `mvsjob.sh down` never sees `HHC01412I` | Something is blocking shutdown | **Do not kill the process.** Wait longer, or consult `docs/runbooks/tk5-hercules-setup.md` §12 Trap 7 |
+| `mvsjob.sh down` exits 1 | The stop could not be verified: Hercules is still running with a disk or printer file open, or it exited without one complete termination sequence | **Do not kill anything, and never send `quit` by hand.** Read `~/mvsjob-out/down-*.txt`; run `~/mvsjob.sh down` again later (it sends nothing once a shutdown has begun) — see §6.4 and runbook §12 Traps 7–8 |
 | Cross-compile (§3.2) fails on `add/` | Expected — see §3.2 | Not a bug; `add/` is excluded by design |
 | `qemu-s390x` not found | Package not installed, or wrong distro | Re-run §4.2; confirm you're inside the WSL2 shell, not PowerShell |
 | DASD/disk corruption, MVS won't IPL after a crash | An unclean stop happened at some point | Delete `~/mvs-tk5`, re-unpack from the zip (§4.3) — the SHA-256 in §2 means this is always a safe, cheap recovery |
 | `Permission denied` on any `mvsjob.sh`/TK5 command | Install lives under `/root` but you're not running as `root` | Move it to `~/mvs-tk5` (§4.3) instead — this is the fix, not `sudo` on every command going forward |
-| Shutdown times out without `HHC01412I` | The shutdown request may not have been processed yet | Confirm Hercules is still responsive (`echo '/d t' > ~/tk5.fifo`, check the log a few seconds later), then simply run `~/mvsjob.sh down` again — see §6.4 |
+| `mvsjob.sh down` exits 2, `FORCED STOP` | Hercules hung after closing every disk (runbook §12 Trap 8); usually because one MVS shutdown step failed | Not a clean stop, though the disks were verified. The report under `~/mvsjob-out/` names the failed step. Re-extract (§4.3) before any evidence run |
+| A `down` from before 2026-10-21 hangs, or prints `HHC01412I` twice | That version powered off with MVS still up (Trap 8); a second `quit` forges the message | Replace `~/mvsjob.sh` with the current `docs/runbooks/mvsjob.sh`, all three lines of §4.4; count that tree's last stop as unclean |
 
 For anything not covered here, `docs/runbooks/tk5-hercules-setup.md` §10 and §12 have
 the full, narrated troubleshooting history from when this was first set up, including

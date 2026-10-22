@@ -153,11 +153,13 @@ stateDiagram-v2
     Up --> RunningJob: a job is submitted
     RunningJob --> Up: job ends,<br/>HASP395 appears
 
-    Up --> ShuttingDown: mvsjob.sh down
-    ShuttingDown --> CleanlyStopped: HHC01412I appears -<br/>the ONLY accepted proof
+    Up --> ShuttingDown: mvsjob.sh down<br/>(MVS first, then Hercules)
+    ShuttingDown --> CleanlyStopped: ONE complete shutdown ending in<br/>HHC01412I, then the process exits
+    ShuttingDown --> ForcedStop: Hercules hangs after closing every disk -<br/>down kills it, checks the disks (exit 2)
     ShuttingDown --> Corrupted: the process dies first<br/>(killed, crashed, disconnected)
 
     CleanlyStopped --> Booting: mvsjob.sh up again
+    ForcedStop --> NeverBooted: re-extract before<br/>any evidence run
     BootFailed --> NeverBooted: re-extract from the zip
     Corrupted --> NeverBooted: re-extract from the zip -<br/>the ONLY recovery
 
@@ -183,14 +185,25 @@ stateDiagram-v2
   be in right before a live demo.
 - **RunningJob.** A submitted program is actively assembling, linking, or executing.
   This is a brief, transient state — seconds, not minutes.
-- **ShuttingDown.** A shutdown has been requested and the system is in the middle of
-  safely writing everything to disk before stopping.
-- **CleanlyStopped.** Shutdown finished correctly. **The single message
-  `HHC01412I Hercules terminated`** is the *only* thing this project accepts as proof
-  of this — not "the window closed," not "the process isn't running anymore." The
-  reason for that strictness: a process can stop running for many reasons, and only one
-  of them (this exact message appearing) means the disk was left in a trustworthy
-  state.
+- **ShuttingDown.** A shutdown has been requested. It happens in two stages. First the
+  mainframe operating system, MVS, stops its own services and its job system. Then the
+  emulator, Hercules, writes everything to disk and stops. The order matters: if
+  Hercules is stopped while MVS is still running, Hercules hangs halfway through its own
+  shutdown (runbook §12 Trap 8).
+- **CleanlyStopped.** Shutdown finished correctly. The proof is **one complete Hercules
+  shutdown in the log, ending in `HHC01412I Hercules terminated`, followed by the
+  process actually exiting**. Not "the window closed," not "the process isn't running
+  anymore," and not the message on its own: if anyone sends a second `quit`, Hercules
+  prints `HHC01412I` again even though its shutdown never finished. The reason for that
+  strictness: a process can stop running for many reasons, and only one of them means
+  the disk was left in a trustworthy state.
+- **ForcedStop.** Hercules hung after it had already closed every disk file. `down` did
+  not wait forever. It checked that no disk or printer file was still open, killed the
+  emulator, and then checked every disk image for damage. It records all of this loudly,
+  and it exits with code 2. The difference from **Corrupted** is *when* the kill
+  happened: here it came after the disks were closed, and the check proves they are
+  intact. It is still **not** counted as a clean stop, so start evidence runs from a
+  fresh copy.
 - **Corrupted.** Something stopped the system *before* it finished its own shutdown
   sequence — the terminal was closed, the process was killed, the connection dropped.
   **The disk file may now contain a write that was only half-completed.** This state is
@@ -207,9 +220,11 @@ stateDiagram-v2
 **If you need to stop the demo mid-session for any reason, always run the shutdown
 command and wait for it to confirm — never just close the terminal.** The diagram's
 entire "Corrupted" branch, and the three real incidents that motivated documenting it,
-all trace back to skipping this. If a shutdown ever fails to confirm, the fix is not to
-force it — it's to leave it alone, re-extract a fresh copy from the verified download
-(§4 of `RUN.md`), and treat the abandoned copy as untrustworthy going forward.
+all trace back to skipping this. If a shutdown ever fails to confirm (`down` exits 1),
+the fix is not to force it yourself, and never to type `quit` by hand. Leave it alone,
+and run `down` again later, which is safe: once a shutdown has begun it only watches. If
+it still won't confirm, re-extract a fresh copy from the verified download (§4 of
+`RUN.md`) and treat the abandoned copy as untrustworthy going forward.
 
 ---
 

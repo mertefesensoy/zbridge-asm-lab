@@ -2,7 +2,9 @@
 
 **Date:** 2026-08-10
 **Author:** Mert Efe Şensoy
-**Status:** shipped
+**Status:** shipped. The shutdown half is superseded by
+[`2026-10-21-mvsjob-down-mvs-first-shutdown.md`](2026-10-21-mvsjob-down-mvs-first-shutdown.md):
+`poweroff` with MVS still up hangs Hercules. The `$HOME` fix stands.
 
 ---
 
